@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    --background: 20 50% 98%;
+    --background-secondary: 20 30% 96%;
+    --background-tertiary: 20 20% 94%;
+    --background-elevated: 0 0% 100%;
+
+    --foreground: 230 25% 12%;
+    --foreground-secondary: 220 10% 40%;
+    --foreground-muted: 220 8% 55%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 230 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 25% 12%;
+
+    --primary: 14 78% 57%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 14 78% 57%;
+
+    --secondary: 20 20% 94%;
+    --secondary-foreground: 230 25% 12%;
+
+    --muted: 20 15% 92%;
+    --muted-foreground: 220 8% 55%;
+
+    --accent: 14 78% 57%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 20 15% 90%;
+    --input: 20 15% 90%;
+    --ring: 14 78% 57%;
+
+    --radius: 0.75rem;
+
+    --sidebar-width: 228px;
+    --topbar-height: 56px;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 10% 40%;
+    --sidebar-primary: 14 78% 57%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 30% 96%;
+    --sidebar-accent-foreground: 230 25% 12%;
+    --sidebar-border: 20 15% 90%;
+    --sidebar-ring: 14 78% 57%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    @apply bg-background text-foreground antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--foreground-muted));
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-card border border-border rounded-xl shadow-sm;
+  }
+  .stat-card {
+    @apply glass-card p-5 hover:shadow-md transition-shadow;
+  }
+  .glow-primary {
+    box-shadow: 0 0 40px -10px hsl(var(--primary) / 0.3);
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--info))];
+  }
+}

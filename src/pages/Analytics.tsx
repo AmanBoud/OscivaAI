@@ -1,0 +1,92 @@
+import Topbar from "@/components/layout/Topbar";
+import { MessageSquare, MessagesSquare, CheckCircle, Star, Bot } from "lucide-react";
+import { useAgents } from "@/context/AgentContext";
+
+export default function Analytics() {
+  const { agents } = useAgents();
+
+  const totalMessages = agents.reduce((sum, a) => sum + a.messages, 0);
+  const totalConversations = agents.reduce((sum, a) => sum + a.conversations, 0);
+  const avgRating = agents.length > 0
+    ? (agents.reduce((sum, a) => sum + a.rating, 0) / agents.length).toFixed(1)
+    : "0.0";
+  const activeAgents = agents.filter((a) => a.active).length;
+
+  const stats = [
+    { label: "Total Messages", value: totalMessages.toLocaleString(), icon: MessageSquare, color: "text-primary" },
+    { label: "Conversations", value: totalConversations.toLocaleString(), icon: MessagesSquare, color: "text-info" },
+    { label: "Active Agents", value: `${activeAgents}`, icon: CheckCircle, color: "text-success" },
+    { label: "Avg Rating", value: `${avgRating}/5`, icon: Star, color: "text-warning" },
+  ];
+
+  if (agents.length === 0) {
+    return (
+      <>
+        <Topbar title="Analytics" subtitle="Performance insights" />
+        <div className="p-6 animate-fade-up flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Bot size={32} className="text-primary" />
+          </div>
+          <h2 className="text-lg font-bold text-foreground">No data yet</h2>
+          <p className="text-sm text-foreground-muted text-center max-w-sm">
+            Create and deploy agents to start seeing analytics. Data will appear here in real-time as your agents handle conversations.
+          </p>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Topbar title="Analytics" subtitle="Performance insights" />
+      <div className="p-4 md:p-6 space-y-6 animate-fade-up">
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((s) => (
+            <div key={s.label} className="stat-card">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-foreground-muted font-medium">{s.label}</span>
+                <s.icon size={18} className={s.color} />
+              </div>
+              <div className="text-2xl font-bold text-foreground">{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Agent table */}
+        <div className="glass-card overflow-hidden">
+          <div className="p-4 border-b border-border">
+            <h3 className="text-sm font-semibold text-foreground">Agent Performance</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  {["Agent", "Messages", "Conversations", "Rating", "Sources", "Status"].map((h) => (
+                    <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-foreground-muted uppercase tracking-wider">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {agents.map((a) => (
+                  <tr key={a.id} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
+                    <td className="px-4 py-3 text-xs font-medium text-foreground">{a.name}</td>
+                    <td className="px-4 py-3 text-xs text-foreground-secondary">{a.messages.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-xs text-foreground-secondary">{a.conversations}</td>
+                    <td className="px-4 py-3 text-xs text-warning font-medium">{a.rating}</td>
+                    <td className="px-4 py-3 text-xs text-foreground-secondary">{a.sources.length}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${a.active ? "bg-success/10 text-success" : "bg-foreground-muted/10 text-foreground-muted"}`}>
+                        {a.active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
