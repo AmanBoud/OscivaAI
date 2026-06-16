@@ -5,7 +5,6 @@ import { Loader2, Eye, EyeOff, Check, Bot, Zap, Shield, Sparkles, ArrowLeft } fr
 import { toast } from "sonner";
 import authAgentAvatar from "@/assets/auth-agent-avatar.png";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 
 
 const passwordRules = [
@@ -101,15 +100,17 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/dashboard",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin + "/dashboard",
+        },
       });
-      if (result.error) {
+      if (error) {
         toast.error("Google sign-in failed. Please try again.");
         return;
       }
-      if (result.redirected) return;
-      navigate("/dashboard");
+      // Supabase redirects the browser to Google; nothing else to do here.
     } catch {
       toast.error("Google sign-in failed.");
     } finally {
