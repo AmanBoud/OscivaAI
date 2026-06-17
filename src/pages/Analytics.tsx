@@ -1,6 +1,21 @@
 import Topbar from "@/components/layout/Topbar";
-import { MessageSquare, MessagesSquare, CheckCircle, Star, Bot } from "lucide-react";
+import { MessageSquare, MessagesSquare, CheckCircle, Star, Bot, ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAgents } from "@/context/AgentContext";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ConversationRow {
+  id: string;
+  agent_id: string;
+  message_count: number;
+  last_message_at: string;
+}
+interface ConversationMessage {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+}
 
 export default function Analytics() {
   const { agents } = useAgents();
@@ -11,6 +26,47 @@ export default function Analytics() {
     ? (agents.reduce((sum, a) => sum + a.rating, 0) / agents.length).toFixed(1)
     : "0.0";
   const activeAgents = agents.filter((a) => a.active).length;
+
+  const agentName = (id: string) => agents.find((a) => a.id === id)?.name ?? "Agent";
+
+  // --- Recent conversation transcripts (owner-only via RLS) ---
+  const [conversations, setConversations] = useState<ConversationRow[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Record<string, ConversationMessage[]>>({});
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("conversations")
+          .select("id, agent_id, message_count, last_message_at")
+          .order("last_message_at", { ascending: false })
+          .limit(25);
+        if (!error && active && data) setConversations(data as ConversationRow[]);
+      } catch {
+        // table may not be deployed yet — silently skip the section
+      }
+    })();
+    return () => { active = false; };
+  }, [agents.length]);
+
+  const toggleConversation = async (id: string) => {
+    if (expandedId === id) { setExpandedId(null); return; }
+    setExpandedId(id);
+    if (!messages[id]) {
+      try {
+        const { data } = await supabase
+          .from("conversation_messages")
+          .select("id, role, content, created_at")
+          .eq("conversation_id", id)
+          .order("created_at", { ascending: true });
+        setMessages((prev) => ({ ...prev, [id]: (data as ConversationMessage[]) ?? [] }));
+      } catch {
+        setMessages((prev) => ({ ...prev, [id]: [] }));
+      }
+    }
+  };
 
   const stats = [
     { label: "Total Messages", value: totalMessages.toLocaleString(), icon: MessageSquare, color: "text-primary" },
@@ -86,6 +142,49 @@ export default function Analytics() {
             </table>
           </div>
         </div>
+
+        {/* Recent conversations */}
+        {conversations.length > 0 && (
+          <div className="glass-card overflow-hidden">
+            <div className="p-4 border-b border-border">
+              <h3 className="text-sm font-semibold text-foreground">Recent Conversations</h3>
+              <p className="text-[11px] text-foreground-muted mt-0.5">Real visitor chats from your embedded widget. Click to view the transcript.</p>
+            </div>
+            <div className="divide-y divide-border/50">
+              {conversations.map((c) => (
+                <div key={c.id}>
+                  <button
+                    onClick={() => toggleConversation(c.id)}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/30 transition-colors text-left"
+                  >
+                    {expandedId === c.id ? <ChevronDown size={14} className="text-foreground-muted shrink-0" /> : <ChevronRight size={14} className="text-foreground-muted shrink-0" />}
+                    <span className="text-xs font-medium text-foreground flex-1 truncate">{agentName(c.agent_id)}</span>
+                    <span className="text-[10px] text-foreground-muted">{new Date(c.last_message_at).toLocaleString()}</span>
+                  </button>
+                  {expandedId === c.id && (
+                    <div className="px-4 pb-4 pt-1 space-y-2 bg-secondary/20">
+                      {(messages[c.id] ?? []).length === 0 ? (
+                        <p className="text-[11px] text-foreground-muted py-2">No messages.</p>
+                      ) : (
+                        messages[c.id].map((m) => (
+                          <div key={m.id} className={`max-w-[85%] ${m.role === "user" ? "ml-auto" : ""}`}>
+                            <div className={`p-2 rounded-lg text-[11px] whitespace-pre-wrap ${
+                              m.role === "user"
+                                ? "bg-primary text-primary-foreground rounded-br-none"
+                                : "bg-background border border-border text-foreground-secondary rounded-bl-none"
+                            }`}>
+                              {m.content}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

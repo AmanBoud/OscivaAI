@@ -22,7 +22,7 @@ const models = [
   { id: "claude-sonnet", name: "Claude Sonnet 4", desc: "Best for analysis", provider: "Anthropic" },
   { id: "claude-haiku", name: "Claude Haiku 4.5", desc: "Ultra-fast responses", provider: "Anthropic" },
   { id: "gemini-flash", name: "Gemini 2.0 Flash", desc: "Google's fastest", provider: "Google" },
-  { id: "gemini-pro", name: "Gemini 1.5 Pro", desc: "Advanced reasoning", provider: "Google" },
+  { id: "gemini-pro", name: "Gemini 2.5 Pro", desc: "Advanced reasoning", provider: "Google" },
   { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B", desc: "Meta · open-source flagship", provider: "OpenRouter" },
   { id: "mistralai/mistral-large", name: "Mistral Large", desc: "Mistral · strong reasoning", provider: "OpenRouter" },
   { id: "deepseek/deepseek-chat", name: "DeepSeek V3", desc: "DeepSeek · cheap & smart", provider: "OpenRouter" },
@@ -61,6 +61,7 @@ export default function CreateAgent() {
   const [sources, setSources] = useState<AgentSource[]>(existingAgent?.sources ?? []);
   const [chunks, setChunks] = useState<AgentChunk[]>(existingAgent?.chunks ?? []);
   const [welcomeMsg, setWelcomeMsg] = useState(existingAgent?.welcomeMsg ?? "Hi 👋 How can I help you today?");
+  const [logoUrl, setLogoUrl] = useState(existingAgent?.logoUrl ?? "");
   const [suggestions, setSuggestions] = useState(existingAgent?.suggestions ?? ["What services do you offer?", "How can I contact support?"]);
   const [newSuggestion, setNewSuggestion] = useState("");
   const [position, setPosition] = useState<"left" | "right">(existingAgent?.position ?? "right");
@@ -209,6 +210,7 @@ export default function CreateAgent() {
       color: "#1e293b",
       position,
       chatIcon: "🤖",
+      logoUrl: logoUrl.trim(),
       welcomeMsg,
       suggestions,
       sources,
@@ -439,6 +441,21 @@ export default function CreateAgent() {
               {/* Tab 2: Appearance */}
               {tab === 2 && (
                 <>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Logo URL (shown in the chat header)</label>
+                    <div className="flex items-center gap-2">
+                      {logoUrl && (
+                        <img src={logoUrl} alt="logo" className="w-9 h-9 rounded-full object-cover border border-border shrink-0" />
+                      )}
+                      <input
+                        value={logoUrl}
+                        onChange={(e) => setLogoUrl(e.target.value)}
+                        placeholder="https://your-site.com/logo.png"
+                        className="flex-1 px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
+                    <p className="text-[10px] text-foreground-muted mt-1">Paste a public image URL. Leave blank to use the default chat icon.</p>
+                  </div>
                   <div>
                     <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Welcome Message</label>
                     <input

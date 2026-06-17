@@ -3,79 +3,40 @@ import { useState } from "react";
 import { Copy, Check, Send, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useAgents } from "@/context/AgentContext";
-import { chatComplete, MissingApiKeyError, ChatMessage } from "@/lib/aiClient";
-import { retrieveTopChunks, buildRagSystemPrompt } from "@/lib/rag";
-import { getKeyForModel } from "@/lib/apiKeyStore";
 import { recordAgentActivity } from "@/lib/agentStats";
 
 const embedTabs = ["HTML Snippet", "React / Next.js", "WordPress"];
 
+// Public chat edge function — the same backend the embedded widget uses.
+const CHAT_FN = `${import.meta.env.VITE_SUPABASE_URL ?? "https://ydvzfinuypdjkfnzdpkt.supabase.co"}/functions/v1/chat`;
+
+type ChatMessage = { role: "user" | "assistant"; content: string };
+
 const configOptions = [
-  { key: "agentId", type: "string", desc: "Unique Osciva agent identifier" },
-  { key: "companyName", type: "string", desc: "Brand name shown in the chat header" },
-  { key: "tagline", type: "string", desc: "Subtitle under the company name (e.g. AI Assistant)" },
-  { key: "welcomeMessage", type: "string", desc: "First message shown when the widget opens" },
-  { key: "webhookUrl", type: "string", desc: "Backend chat endpoint for this agent" },
-  { key: "theme", type: "string", desc: "Color theme (purple, blue, green, dark)" },
-  { key: "position", type: "string", desc: "left or right (default right)" },
-  { key: "bubbleMessages", type: "string[]", desc: "Rotating teaser messages above the bubble" },
+  { key: "data-agent-id", type: "string", desc: "Your Osciva agent ID (required)" },
+  { key: "data-api", type: "string", desc: "Osciva chat endpoint (pre-filled, don't change)" },
 ];
-
-// Map an agent's hex/named color to an Osciva theme keyword used by the
-// hosted widget stylesheet. Falls back to "purple" to match brand default.
-function colorToTheme(c?: string): string {
-  if (!c) return "purple";
-  const v = c.toLowerCase();
-  if (v.includes("purple") || v.startsWith("#7") || v.startsWith("#8") || v.startsWith("#9")) return "purple";
-  if (v.includes("blue") || v.startsWith("#1e3") || v.startsWith("#2563") || v.startsWith("#3b82")) return "blue";
-  if (v.includes("green") || v.startsWith("#10b") || v.startsWith("#22c")) return "green";
-  if (v.includes("dark") || v === "#000" || v.startsWith("#0") || v.startsWith("#1")) return "dark";
-  return "purple";
-}
-
-// The embed snippet uses the hosted Osciva widget loader (osciva.io/chat),
-// so no inline runtime is required here. The page only generates a small
-// configuration block + script tag pointing at the hosted widget.
 
 export default function Embed() {
   const { agents } = useAgents();
   const [selectedAgent, setSelectedAgent] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
 
   const currentAgent = agents[selectedAgent];
   const agentId = currentAgent?.id ?? "";
-  const apiKey = currentAgent ? (getKeyForModel(currentAgent.model).key ?? "") : "";
 
-  // The hosted widget loader handles its own prompt + RAG retrieval server-side
-  // via the webhookUrl, so the snippet only needs identity + branding config.
-
-  const theme = colorToTheme(currentAgent?.color);
-  const position = currentAgent?.position === "left" ? "left" : "right";
-  const bubbleMessages = ["Need help? 💬", "Ask me anything 💡", "We're here for you 👋"];
+  // Widget is served from this app's own domain (Vite/Vercel serves /public).
+  const widgetSrc = `${typeof window !== "undefined" ? window.location.origin : "https://app.osciva.io"}/osciva-chat.js`;
 
   const htmlSnippet = currentAgent
     ? `<!-- Osciva AI Chat Widget -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="https://osciva.io/chat/osciva-chat.css">
-<script>
-  window.OscivaConfig = {
-    agentId: "${currentAgent.id}",
-    headerLogo: "https://osciva.io/images/osciva-web.png",
-    bubbleLogo: "https://osciva.io/images/osciva-web.png",
-    companyName: ${JSON.stringify(currentAgent.name)},
-    tagline: "AI Assistant",
-    welcomeMessage: ${JSON.stringify(currentAgent.welcomeMsg || "Hi 👋 How can I help you today?")},
-    webhookUrl: "https://api.osciva.io/v1/chat/${currentAgent.id}",
-    theme: "${theme}",
-    position: "${position}",
-    bubbleMessages: ${JSON.stringify(bubbleMessages)}
-  };
-</script>
-<script src="https://osciva.io/chat/osciva-chat.js"></script>`
+<script src="${widgetSrc}"
+  data-agent-id="${currentAgent.id}"
+  data-api="${CHAT_FN}"></script>`
     : "";
 
   const reactSnippet = currentAgent
@@ -83,31 +44,13 @@ export default function Embed() {
 
 export function OscivaChat() {
   useEffect(() => {
-    (window as any).OscivaConfig = {
-      agentId: "${currentAgent.id}",
-      headerLogo: "https://osciva.io/images/osciva-web.png",
-      bubbleLogo: "https://osciva.io/images/osciva-web.png",
-      companyName: ${JSON.stringify(currentAgent.name)},
-      tagline: "AI Assistant",
-      welcomeMessage: ${JSON.stringify(currentAgent.welcomeMsg || "Hi 👋 How can I help you today?")},
-      webhookUrl: "https://api.osciva.io/v1/chat/${currentAgent.id}",
-      theme: "${theme}",
-      position: "${position}",
-      bubbleMessages: ${JSON.stringify(bubbleMessages)},
-    };
-    const font = document.createElement("link");
-    font.rel = "stylesheet";
-    font.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap";
-    document.head.appendChild(font);
-    const css = document.createElement("link");
-    css.rel = "stylesheet";
-    css.href = "https://osciva.io/chat/osciva-chat.css";
-    document.head.appendChild(css);
     const s = document.createElement("script");
-    s.src = "https://osciva.io/chat/osciva-chat.js";
+    s.src = "${widgetSrc}";
     s.async = true;
+    s.setAttribute("data-agent-id", "${currentAgent.id}");
+    s.setAttribute("data-api", "${CHAT_FN}");
     document.body.appendChild(s);
-    return () => { font.remove(); css.remove(); s.remove(); };
+    return () => { s.remove(); };
   }, []);
   return null;
 }`
@@ -133,30 +76,25 @@ ${htmlSnippet}
   const sendTestMessage = async () => {
     if (!chatInput.trim() || chatLoading || !currentAgent) return;
     const userMsg = chatInput.trim();
-    const newHistory: ChatMessage[] = [
-      ...chatMessages.map((m) => ({ role: m.role, content: m.content })),
-      { role: "user", content: userMsg },
-    ];
-    setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    const newHistory: ChatMessage[] = [...chatMessages, { role: "user", content: userMsg }];
+    setChatMessages(newHistory);
     setChatInput("");
     setChatLoading(true);
     try {
-      const ctx = retrieveTopChunks(userMsg, currentAgent.chunks ?? [], 3);
-      const prompt = buildRagSystemPrompt({
-        agentName: currentAgent.name,
-        instructions: currentAgent.instructions,
-        personality: currentAgent.personality,
-        contextChunks: ctx,
+      const res = await fetch(CHAT_FN, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ agentId: currentAgent.id, messages: newHistory.slice(-12), test: true }),
       });
-      const reply = await chatComplete(currentAgent.model, prompt, newHistory);
-      setChatMessages((prev) => [...prev, { role: "assistant", content: reply || "(empty)" }]);
+      const data = await res.json();
+      const reply = data?.reply || (data?.error ? `❌ ${data.error}` : "(no response)");
+      setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       recordAgentActivity(currentAgent.id);
     } catch (err) {
-      const message =
-        err instanceof MissingApiKeyError
-          ? `⚠️ Please add your **${err.provider}** API key in Settings → API Keys to use this model.`
-          : `❌ ${err instanceof Error ? err.message : "Something went wrong"}`;
-      setChatMessages((prev) => [...prev, { role: "assistant", content: message }]);
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `❌ ${err instanceof Error ? err.message : "Connection failed"}` },
+      ]);
     } finally {
       setChatLoading(false);
     }
@@ -193,12 +131,6 @@ ${htmlSnippet}
                 <Copy size={14} />
               </button>
             </div>
-
-            {!apiKey && (
-              <div className="glass-card p-3 border border-warning/30 bg-warning/5 text-xs text-foreground-secondary">
-                ⚠️ No API key found for this model. Please add it in the <a href="/api-keys" className="text-primary underline">API Keys</a> page.
-              </div>
-            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
@@ -238,7 +170,7 @@ ${htmlSnippet}
                       <RotateCcw size={10} /> Clear
                     </button>
                   </div>
-                  <p className="text-[10px] text-foreground-muted mb-3">Tests with the same model + API key the embedded widget will use.</p>
+                  <p className="text-[10px] text-foreground-muted mb-3">Live answers from your agent's real backend + knowledge base — exactly what visitors get.</p>
                   <div className="bg-secondary/30 rounded-lg p-3 h-56 overflow-y-auto space-y-2 mb-2">
                     <div className="bg-background p-2 rounded-lg rounded-bl-none max-w-[85%] border border-border">
                       <p className="text-[11px] text-foreground-secondary">{currentAgent?.welcomeMsg ?? "Hi 👋 How can I help you today?"}</p>

@@ -1,4 +1,8 @@
-// Simple localStorage-backed API key store with cross-tab sync via storage event
+// API key store. Keys are persisted server-side in Supabase (so the chat edge
+// function can use the owner's key for the embedded widget) and mirrored into
+// localStorage for the in-app pre-save preview.
+
+import { supabase } from "@/integrations/supabase/client";
 
 const STORAGE_KEY = "osciva_api_keys_v1";
 
@@ -53,6 +57,30 @@ export function getKeyForModel(modelId: string): { provider: Provider; key?: str
   if (modelId.startsWith("claude")) return { provider: "Anthropic", key: keys["Anthropic"] };
   if (modelId.startsWith("gemini")) return { provider: "Google AI", key: keys["Google AI"] };
   return { provider: "OpenAI", key: keys["OpenAI"] };
+}
+
+// ---- Server (Supabase) persistence ----
+// The chat edge function reads these keys to answer visitors of the embedded widget.
+
+export async function syncKeyToServer(provider: Provider, value: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  if (value) {
+    await supabase
+      .from("user_api_keys")
+      .upsert({ user_id: user.id, provider, api_key: value, updated_at: new Date().toISOString() });
+  } else {
+    await supabase.from("user_api_keys").delete().eq("user_id", user.id).eq("provider", provider);
+  }
+}
+
+export async function loadKeysFromServer(): Promise<ApiKeyMap> {
+  const { data } = await supabase.from("user_api_keys").select("provider, api_key");
+  const map: ApiKeyMap = {};
+  (data ?? []).forEach((r: { provider: string; api_key: string }) => {
+    map[r.provider as Provider] = r.api_key;
+  });
+  return map;
 }
 
 export function onKeysChanged(cb: () => void) {

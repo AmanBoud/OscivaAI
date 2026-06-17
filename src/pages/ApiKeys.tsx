@@ -2,7 +2,7 @@ import Topbar from "@/components/layout/Topbar";
 import { useEffect, useState } from "react";
 import { Shield, Eye, EyeOff, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { loadKeys, setKey, ApiKeyMap, Provider } from "@/lib/apiKeyStore";
+import { loadKeys, setKey, loadKeysFromServer, syncKeyToServer, ApiKeyMap, Provider } from "@/lib/apiKeyStore";
 
 const providers: { name: Provider; docs: string; description?: string }[] = [
   { name: "OpenAI", docs: "https://platform.openai.com/api-keys" },
@@ -17,30 +17,40 @@ export default function ApiKeys() {
   const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const stored = loadKeys();
-    setKeys(stored);
+    // Server is the source of truth; mirror into localStorage for the pre-save preview.
+    setKeys(loadKeys());
+    loadKeysFromServer().then((serverKeys) => {
+      setKeys(serverKeys);
+      (Object.keys(serverKeys) as Provider[]).forEach((p) => setKey(p, serverKeys[p] ?? ""));
+    });
   }, []);
 
   const toggleVisibility = (name: string) => setVisible((prev) => ({ ...prev, [name]: !prev[name] }));
 
-  const saveKey = (name: Provider) => {
+  const saveKey = async (name: Provider) => {
     const value = drafts[name]?.trim();
     if (!value) {
       toast.error("Please enter an API key first");
       return;
     }
-    setKey(name, value);
+    setKey(name, value); // local mirror
     setKeys((prev) => ({ ...prev, [name]: value }));
     setDrafts((prev) => ({ ...prev, [name]: "" }));
-    toast.success(`${name} API key saved`);
+    try {
+      await syncKeyToServer(name, value);
+      toast.success(`${name} API key saved`);
+    } catch {
+      toast.error("Saved locally, but failed to sync to server. Check your connection.");
+    }
   };
 
-  const removeKey = (name: Provider) => {
+  const removeKey = async (name: Provider) => {
     setKey(name, "");
     setKeys((prev) => {
       const { [name]: _, ...rest } = prev;
       return rest;
     });
+    await syncKeyToServer(name, "").catch(() => {});
     toast.success(`${name} key removed`);
   };
 
@@ -51,8 +61,8 @@ export default function ApiKeys() {
         <div className="glass-card p-4 flex items-center gap-3 border-primary/20">
           <Shield size={20} className="text-primary shrink-0" />
           <div>
-            <p className="text-xs font-semibold text-foreground">Secure local storage</p>
-            <p className="text-[10px] text-foreground-muted">Your API keys are stored only in your browser and used directly to call the AI providers</p>
+            <p className="text-xs font-semibold text-foreground">Saved securely to your account</p>
+            <p className="text-[10px] text-foreground-muted">Stored in your Osciva account (Supabase) and used server-side so your live website widget can chat. Visitors never see your key.</p>
           </div>
         </div>
 
@@ -115,7 +125,7 @@ export default function ApiKeys() {
 
         <div className="glass-card p-4 border-info/20">
           <p className="text-[10px] text-foreground-muted">
-            🔒 Keys are stored in your browser's localStorage and used directly when chatting with your agents. They never leave your device except to call the provider's API.
+            🔒 Your key is used server-side only to call your chosen AI provider when your chatbot answers. It is never sent to the embedded widget or shown to your website visitors.
           </p>
         </div>
       </div>

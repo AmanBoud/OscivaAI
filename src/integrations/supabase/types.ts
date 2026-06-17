@@ -14,6 +14,97 @@ export type Database = {
   }
   public: {
     Tables: {
+      user_api_keys: {
+        Row: {
+          user_id: string
+          provider: string
+          api_key: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          provider: string
+          api_key: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          provider?: string
+          api_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          id: string
+          agent_id: string
+          user_id: string
+          message_count: number
+          started_at: string
+          last_message_at: string
+        }
+        Insert: {
+          id?: string
+          agent_id: string
+          user_id: string
+          message_count?: number
+          started_at?: string
+          last_message_at?: string
+        }
+        Update: {
+          id?: string
+          agent_id?: string
+          user_id?: string
+          message_count?: number
+          started_at?: string
+          last_message_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          agent_id: string
+          role: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          agent_id: string
+          role: string
+          content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          agent_id?: string
+          role?: string
+          content?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_chunks: {
         Row: {
           agent_id: string
@@ -121,6 +212,7 @@ export type Database = {
           updated_at: string
           user_id: string
           welcome_msg: string
+          logo_url: string | null
         }
         Insert: {
           active?: boolean
@@ -142,6 +234,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           welcome_msg?: string
+          logo_url?: string | null
         }
         Update: {
           active?: boolean
@@ -163,6 +256,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           welcome_msg?: string
+          logo_url?: string | null
         }
         Relationships: []
       }

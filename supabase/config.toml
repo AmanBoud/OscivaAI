@@ -1,1 +1,9 @@
-project_id = "smqzdhwikzosgbxfwymq"
+project_id = "ydvzfinuypdjkfnzdpkt"
+
+# Public widget endpoint — embedded on arbitrary customer sites, so no JWT.
+[functions.chat]
+verify_jwt = false
+
+# Owner-only embedding job — requires the owner's JWT.
+[functions.ingest]
+verify_jwt = true

@@ -24,6 +24,7 @@ export interface Agent {
   color: string;
   position: "left" | "right";
   chatIcon: string;
+  logoUrl: string;
   welcomeMsg: string;
   suggestions: string[];
   sources: AgentSource[];
@@ -80,6 +81,7 @@ function rowToAgent(
     color: row.color,
     position: row.position,
     chatIcon: row.chat_icon,
+    logoUrl: row.logo_url ?? "",
     welcomeMsg: row.welcome_msg,
     suggestions: row.suggestions ?? [],
     sources: agentSources,
@@ -163,6 +165,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
         color: agent.color,
         position: agent.position,
         chat_icon: agent.chatIcon,
+        logo_url: agent.logoUrl,
         welcome_msg: agent.welcomeMsg,
         suggestions: agent.suggestions,
         password_enabled: agent.passwordEnabled,
@@ -205,6 +208,9 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       for (const batch of chunk(chunkPayload, 100)) {
         await supabase.from("agent_chunks").insert(batch);
       }
+      // Build embeddings server-side (RAG). Fire-and-forget; sources flip to
+      // "Indexed ✓" when the edge function finishes.
+      supabase.functions.invoke("ingest", { body: { agentId } }).catch(() => {});
     }
 
     await loadAgents();
@@ -220,6 +226,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     if (data.color !== undefined) patch.color = data.color;
     if (data.position !== undefined) patch.position = data.position;
     if (data.chatIcon !== undefined) patch.chat_icon = data.chatIcon;
+    if (data.logoUrl !== undefined) patch.logo_url = data.logoUrl;
     if (data.welcomeMsg !== undefined) patch.welcome_msg = data.welcomeMsg;
     if (data.suggestions !== undefined) patch.suggestions = data.suggestions;
     if (data.passwordEnabled !== undefined) patch.password_enabled = data.passwordEnabled;
@@ -282,6 +289,11 @@ export function AgentProvider({ children }: { children: ReactNode }) {
           await supabase.from("agent_chunks").insert(batch);
         }
       }
+    }
+
+    // If knowledge changed, (re)build embeddings server-side for the new chunks.
+    if (data.sources !== undefined || data.chunks !== undefined) {
+      supabase.functions.invoke("ingest", { body: { agentId: id } }).catch(() => {});
     }
 
     await loadAgents();
