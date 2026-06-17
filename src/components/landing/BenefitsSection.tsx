@@ -1,49 +1,36 @@
-import { motion } from "framer-motion";
 import { Globe, Shield, Zap, MessageSquare, Eye, Users } from "lucide-react";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
-};
+import { Reveal, SectionHeading } from "./_primitives";
 
 const benefits = [
-  { icon: MessageSquare, title: "Personalized Conversations", desc: "Your assistant remembers context, recognizes returning users, and gives accurate, on-brand answers using your data." },
-  { icon: Zap, title: "Save 80% of Time", desc: "Automate repetitive questions, lead qualification, and onboarding so your team focuses on what matters most." },
-  { icon: Globe, title: "Speak Your Customer's Language", desc: "Hindi, Tamil, Telugu, Bengali, Kannada and 20+ languages — built for India's diverse customer base." },
-  { icon: Shield, title: "Built for Non-Coders", desc: "Founders, marketers, support leads — anyone in your team can build, edit, and improve your AI assistant." },
-  { icon: Eye, title: "Know What's Happening", desc: "Live conversation logs, top questions, and CSAT — see exactly how your AI is helping customers in real time." },
-  { icon: Users, title: "Built for Indian Business", desc: "INR pricing, GST invoices, India-hosted data, DPDP-compliant. Made in India 🇮🇳, for India." },
+  { icon: MessageSquare, title: "Personalized conversations", desc: "It remembers context, recognizes returning users, and answers on-brand using your data." },
+  { icon: Zap, title: "Save 80% of support time", desc: "Automate repetitive questions, lead qualification and onboarding so your team focuses on what matters." },
+  { icon: Globe, title: "Speak your customer's language", desc: "Hindi, Tamil, Telugu, Bengali, Kannada and 20+ more — built for India's diverse customers." },
+  { icon: Shield, title: "Built for non-coders", desc: "Founders, marketers and support leads can build, edit and improve the assistant themselves." },
+  { icon: Eye, title: "Know what's happening", desc: "Live conversation logs, top questions and resolution rate — see exactly how your AI performs." },
+  { icon: Users, title: "Made for Indian business", desc: "INR pricing, GST invoices, India-hosted data and DPDP-ready controls." },
 ];
 
 export default function BenefitsSection() {
   return (
-    <section className="bg-[#FFF5F0] py-20 md:py-28 px-6">
-      <div className="max-w-[1240px] mx-auto">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className="text-center mb-16">
-          <motion.span variants={fadeUp} custom={0}
-            className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#FDEAE3] text-[12px] font-semibold text-[#E8613C] uppercase tracking-wider mb-4">
-            Benefits
-          </motion.span>
-          <motion.h2 variants={fadeUp} custom={1}
-            className="text-[30px] md:text-[40px] font-extrabold leading-[1.15] tracking-[-0.02em] text-[#1a1a2e] mb-3">
-            An AI Assistant That Works Like Your Best Employee
-          </motion.h2>
-        </motion.div>
+    <section className="bg-white py-20 md:py-28 px-5 sm:px-6">
+      <div className="max-w-[1200px] mx-auto">
+        <SectionHeading
+          eyebrow="Outcomes"
+          title="An assistant that works like your best employee"
+          subtitle="Accurate, always-on, and on-brand — without the overhead of hiring and training."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px rounded-3xl overflow-hidden border border-[#EBEDF0] bg-[#EBEDF0]">
           {benefits.map((b, i) => (
-            <motion.div
-              key={b.title}
-              initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-40px" }}
-              variants={fadeUp} custom={i}
-              className="bg-white rounded-2xl p-6 border border-[#f0ebe6] hover:shadow-lg hover:shadow-[#E8613C]/5 hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="w-11 h-11 rounded-xl bg-[#FDEAE3] flex items-center justify-center mb-4">
-                <b.icon size={20} className="text-[#E8613C]" />
+            <Reveal key={b.title} i={(i % 3)}>
+              <div className="group h-full bg-white p-7 transition-colors hover:bg-[#FBFBFC]">
+                <div className="w-11 h-11 rounded-xl bg-[#FFF1EC] flex items-center justify-center mb-4">
+                  <b.icon size={20} className="text-[#E8613C]" />
+                </div>
+                <h3 className="text-[15.5px] font-bold text-[#0B0E14] mb-2">{b.title}</h3>
+                <p className="text-[13.5px] text-[#586072] leading-relaxed">{b.desc}</p>
               </div>
-              <h3 className="text-[15px] font-bold text-[#1a1a2e] mb-2">{b.title}</h3>
-              <p className="text-[13px] text-[#888] leading-relaxed">{b.desc}</p>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -1,56 +1,70 @@
 import { useNavigate } from "react-router-dom";
 
+const columns = [
+  {
+    title: "Product",
+    links: [
+      { label: "Features", path: "/features" },
+      { label: "Pricing", path: "/pricing" },
+      { label: "How it works", path: "/how-it-works" },
+      { label: "Integrations", path: "/features" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", path: "/" },
+      { label: "Careers", path: "/" },
+      { label: "Blog", path: "/" },
+      { label: "Contact", path: "/contact" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", path: "/" },
+      { label: "Terms", path: "/" },
+      { label: "DPDP", path: "/" },
+      { label: "Security", path: "/" },
+    ],
+  },
+];
+
 export default function FooterSection() {
   const navigate = useNavigate();
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1a1a2e] border-t border-[#2a2a3e] py-14 px-6">
-      <div className="max-w-[1240px] mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-12">
+    <footer className="bg-[#0B0E14] px-5 sm:px-6 pt-16 pb-10">
+      <div className="max-w-[1200px] mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
           <div className="col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <img src="https://osciva.io/images/osciva-web.png" alt="Osciva" className="h-8 w-8" />
-              <span className="text-[16px] font-bold text-white">
-                Osciva <span className="text-[#E8613C]">AI</span>
-              </span>
+              <span className="text-[16px] font-bold text-white tracking-[-0.02em]">Osciva <span className="text-[#E8613C]">AI</span></span>
             </div>
-            <p className="text-[13px] text-[#888] leading-relaxed max-w-xs mb-5">
-              India's first enterprise AI agent platform. Build, train, and deploy intelligent customer support agents in minutes.
+            <p className="text-[13.5px] text-white/55 leading-relaxed max-w-xs mb-6">
+              The no-code platform to build, train and deploy AI assistants on your own data — in minutes.
             </p>
-            <div className="flex items-center gap-2 flex-wrap">
-              {["🇮🇳 India Hosted", "DPDP Compliant", "SOC 2 Ready"].map((b) => (
-                <span key={b} className="text-[10px] px-3 py-1 rounded-full bg-[#2a2a3e] text-[#888] border border-[#333] font-medium">
+            <div className="flex flex-wrap items-center gap-2">
+              {["India hosted", "DPDP ready", "SOC 2"].map((b) => (
+                <span key={b} className="text-[10.5px] px-3 py-1 rounded-full bg-white/[0.06] text-white/60 border border-white/10 font-medium">
                   {b}
                 </span>
               ))}
             </div>
           </div>
-          {[
-            { title: "Product", links: [
-              { label: "Features", action: () => navigate("/features") },
-              { label: "Pricing", action: () => navigate("/pricing") },
-              { label: "How It Works", action: () => navigate("/how-it-works") },
-              { label: "Integrations", action: () => navigate("/features") },
-            ]},
-            { title: "Company", links: [
-              { label: "About Us", action: () => {} },
-              { label: "Careers", action: () => {} },
-              { label: "Blog", action: () => {} },
-              { label: "Contact", action: () => navigate("/contact") },
-            ]},
-            { title: "Legal", links: [
-              { label: "Privacy Policy", action: () => {} },
-              { label: "Terms of Service", action: () => {} },
-              { label: "DPDP Compliance", action: () => {} },
-              { label: "Security", action: () => {} },
-            ]},
-          ].map((col) => (
+
+          {columns.map((col) => (
             <div key={col.title}>
-              <h4 className="text-[11px] font-bold text-[#666] uppercase tracking-wider mb-4">{col.title}</h4>
+              <h4 className="text-[11px] font-bold text-white/40 uppercase tracking-[0.12em] mb-4">{col.title}</h4>
               <ul className="space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <button onClick={link.action} className="text-[13px] text-[#888] hover:text-white transition-colors">
+                    <button
+                      onClick={() => navigate(link.path)}
+                      className="text-[13.5px] text-white/65 hover:text-white transition-colors"
+                    >
                       {link.label}
                     </button>
                   </li>
@@ -59,8 +73,10 @@ export default function FooterSection() {
             </div>
           ))}
         </div>
-        <div className="border-t border-[#2a2a3e] pt-6">
-          <p className="text-[12px] text-[#666]">© 2025 Osciva AI. All rights reserved. Made with ❤️ in India 🇮🇳</p>
+
+        <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-[12.5px] text-white/45">© {year} Osciva AI. All rights reserved.</p>
+          <p className="text-[12.5px] text-white/45">Made in India 🇮🇳</p>
         </div>
       </div>
     </footer>
