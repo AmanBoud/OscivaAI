@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Env files (contain config keys) — never commit
+.env
+.env.*
+
+# Internal working docs / deploy helpers — keep local only
+PROGRESS.md
+BUILD_PROMPT.md
+supabase/DEPLOY_ALL.sql
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
