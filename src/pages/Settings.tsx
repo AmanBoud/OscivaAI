@@ -61,13 +61,13 @@ export default function SettingsPage() {
     <>
       <Topbar title="Settings" subtitle="Manage your account" />
       <div className="p-6 animate-fade-up">
-        <div className="flex gap-1 p-1 bg-secondary rounded-lg mb-5 max-w-lg overflow-x-auto">
+        <div className="flex gap-1 p-1 bg-secondary rounded-xl mb-5 max-w-lg overflow-x-auto">
           {tabs.map((t, i) => (
             <button
               key={t.label}
               onClick={() => setTab(i)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-semibold rounded-md transition-all ${
-                tab === i ? "bg-primary text-primary-foreground" : "text-foreground-muted hover:text-foreground"
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 text-[11px] font-semibold rounded-lg transition-all whitespace-nowrap ${
+                tab === i ? "bg-card text-foreground shadow-sm" : "text-foreground-muted hover:text-foreground"
               }`}
             >
               <t.icon size={12} />
@@ -97,7 +97,7 @@ export default function SettingsPage() {
                 <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Email</label>
                 <input value={email} disabled className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground-muted cursor-not-allowed" />
               </div>
-              <button onClick={saveProfile} disabled={saving} className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 disabled:opacity-60 flex items-center justify-center gap-2">
+              <button onClick={saveProfile} disabled={saving} className="w-full py-2.5 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-[#CF4F2C] transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                 {saving && <Loader2 size={14} className="animate-spin" />}
                 Save Changes
               </button>
@@ -120,7 +120,7 @@ export default function SettingsPage() {
                     onClick={() => setNotifications((prev) => ({ ...prev, [n.key]: !prev[n.key] }))}
                     className={`w-10 h-5 rounded-full transition-all relative ${notifications[n.key] ? "bg-primary" : "bg-border"}`}
                   >
-                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-foreground transition-all ${notifications[n.key] ? "left-5" : "left-0.5"}`} />
+                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${notifications[n.key] ? "left-5" : "left-0.5"}`} />
                   </button>
                 </div>
               ))}

@@ -57,12 +57,14 @@ export default function ApiKeys() {
   return (
     <>
       <Topbar title="API Keys" subtitle="Manage your AI provider keys" />
-      <div className="p-6 space-y-6 animate-fade-up">
-        <div className="glass-card p-4 flex items-center gap-3 border-primary/20">
-          <Shield size={20} className="text-primary shrink-0" />
+      <div className="p-4 sm:p-6 space-y-5 max-w-3xl">
+        <div className="rounded-2xl border border-border bg-card p-5 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Shield size={19} className="text-primary" />
+          </div>
           <div>
-            <p className="text-xs font-semibold text-foreground">Saved securely to your account</p>
-            <p className="text-[10px] text-foreground-muted">Stored in your Osciva account (Supabase) and used server-side so your live website widget can chat. Visitors never see your key.</p>
+            <p className="text-[13.5px] font-bold text-foreground">Saved securely to your account</p>
+            <p className="text-[12px] text-foreground-muted mt-0.5 leading-relaxed">Keys are stored server-side in your Osciva account and used only when your widget answers. Visitors never see them.</p>
           </div>
         </div>
 
@@ -71,7 +73,7 @@ export default function ApiKeys() {
             const stored = keys[p.name];
             const hasKey = !!stored;
             return (
-              <div key={p.name} className="glass-card p-5">
+              <div key={p.name} className="rounded-2xl border border-border bg-card p-5 hover:shadow-premium transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-semibold text-foreground">{p.name}</h3>
@@ -106,7 +108,7 @@ export default function ApiKeys() {
                       {visible[p.name] ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
-                  <button onClick={() => saveKey(p.name)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:brightness-110">
+                  <button onClick={() => saveKey(p.name)} className="px-5 py-2.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-[#CF4F2C] transition-colors">
                     Save
                   </button>
                   {hasKey && (
@@ -123,9 +125,10 @@ export default function ApiKeys() {
           })}
         </div>
 
-        <div className="glass-card p-4 border-info/20">
-          <p className="text-[10px] text-foreground-muted">
-            🔒 Your key is used server-side only to call your chosen AI provider when your chatbot answers. It is never sent to the embedded widget or shown to your website visitors.
+        <div className="rounded-2xl border border-border bg-secondary/40 p-4 flex items-start gap-3">
+          <Shield size={15} className="text-foreground-muted shrink-0 mt-0.5" />
+          <p className="text-[11.5px] text-foreground-muted leading-relaxed">
+            Your key is used server-side only to call your chosen AI provider when your chatbot answers. It is never sent to the embedded widget or shown to your website visitors.
           </p>
         </div>
       </div>

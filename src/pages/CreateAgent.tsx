@@ -267,13 +267,13 @@ export default function CreateAgent() {
         <div className="flex gap-6">
           {/* Left: Config */}
           <div className="flex-1 min-w-0">
-            <div className="flex gap-1 p-1 bg-secondary rounded-lg mb-5">
+            <div className="flex gap-1 p-1 bg-secondary rounded-xl mb-5">
               {tabs.map((t, i) => (
                 <button
                   key={t}
                   onClick={() => setTab(i)}
-                  className={`flex-1 py-2 text-xs font-semibold rounded-md transition-all ${
-                    tab === i ? "bg-primary text-primary-foreground" : "text-foreground-muted hover:text-foreground"
+                  className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                    tab === i ? "bg-card text-foreground shadow-sm" : "text-foreground-muted hover:text-foreground"
                   }`}
                 >
                   {t}
@@ -406,7 +406,7 @@ export default function CreateAgent() {
                       placeholder="https://docs.example.com"
                       className="flex-1 px-3.5 py-2 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                     />
-                    <button onClick={handleAddUrl} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:brightness-110">
+                    <button onClick={handleAddUrl} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-[#CF4F2C] transition-colors">
                       Add URL
                     </button>
                   </div>
@@ -637,7 +637,7 @@ export default function CreateAgent() {
                       placeholder="Type a message..."
                       className="flex-1 px-3.5 py-2.5 rounded-full bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                     />
-                    <button onClick={sendChatMessage} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:brightness-110">
+                    <button onClick={sendChatMessage} className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-[#CF4F2C] transition-colors">
                       <Send size={14} />
                     </button>
                   </div>
@@ -645,7 +645,7 @@ export default function CreateAgent() {
               )}
             </div>
 
-            <button onClick={handleSave} className="mt-4 w-full py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110 transition-all glow-primary">
+            <button onClick={handleSave} className="mt-4 w-full py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-[#CF4F2C] transition-colors transition-all glow-primary">
               {existingAgent ? "Update Agent" : "Create Agent"}
             </button>
           </div>
@@ -677,23 +677,27 @@ export default function CreateAgent() {
                       }`}
                       style={{ border: `1px solid rgba(30,41,59,0.2)` }}
                     >
-                      {/* Header - uses theme color */}
-                      <div className="p-3 text-center relative overflow-hidden" style={{ backgroundColor: "#1e293b" }}>
+                      {/* Header — logo + name aligned to the start (matches the live widget) */}
+                      <div className="px-3 py-2.5 flex items-center gap-2 relative overflow-hidden" style={{ backgroundColor: "#1e293b" }}>
                         <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.2), transparent)` }} />
-                        <div className="relative z-10">
-                          <div className="flex items-center justify-center gap-1.5 mb-1">
-                            <img src="https://osciva.io/images/osciva-web.png" alt="" className="h-5 w-5" />
-                            <span className="text-[11px] font-bold" style={{ color: "#fff" }}>{name || "My Agent"}</span>
+                        <img
+                          src={logoUrl || "https://osciva.io/images/osciva-web.png"}
+                          alt=""
+                          className="relative z-10 h-7 w-7 rounded-full bg-white object-contain p-0.5 shrink-0"
+                        />
+                        <div className="relative z-10 min-w-0 flex-1">
+                          <div className="text-[11px] font-bold leading-tight truncate" style={{ color: "#fff" }}>{name || "My Agent"}</div>
+                          <div className="text-[8px] flex items-center gap-1 leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>
+                            <span className="w-1 h-1 rounded-full bg-green-400" /> Online
                           </div>
-                          <p className="text-[8px]" style={{ color: "rgba(255,255,255,0.7)" }}>AI Assistant</p>
-                          <div className="absolute top-2 right-2 flex gap-1">
-                            <button className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.2)" }}>
-                              <RotateCcw size={8} style={{ color: "#fff" }} />
-                            </button>
-                            <button onClick={() => setWidgetOpen(false)} className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.2)" }}>
-                              <X size={8} style={{ color: "#fff" }} />
-                            </button>
-                          </div>
+                        </div>
+                        <div className="relative z-10 flex gap-1 shrink-0">
+                          <button className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.2)" }}>
+                            <RotateCcw size={8} style={{ color: "#fff" }} />
+                          </button>
+                          <button onClick={() => setWidgetOpen(false)} className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.2)" }}>
+                            <X size={8} style={{ color: "#fff" }} />
+                          </button>
                         </div>
                       </div>
                       {/* Chat area */}

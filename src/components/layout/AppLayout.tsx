@@ -42,7 +42,7 @@ export default function AppLayout() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <div className={isMobile ? "min-h-screen" : "ml-[228px] min-h-screen"}>
+      <div className={isMobile ? "min-h-screen" : "ml-[236px] min-h-screen"}>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

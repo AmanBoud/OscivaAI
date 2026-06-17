@@ -1,14 +1,16 @@
 import Topbar from "@/components/layout/Topbar";
-import { Bot, MessageSquare, MessagesSquare, Clock, TrendingUp, TrendingDown, Plus, ArrowRight } from "lucide-react";
+import { Bot, MessageSquare, MessagesSquare, Clock, TrendingUp, TrendingDown, Plus, ArrowRight, ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAgents } from "@/context/AgentContext";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { getLast7Days, onStatsChanged } from "@/lib/agentStats";
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 const cardVariant = {
   hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }),
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.07, duration: 0.45, ease: EASE } }),
 };
 
 export default function Dashboard() {
@@ -17,7 +19,6 @@ export default function Dashboard() {
   const [tick, setTick] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
 
-  // Refresh every 30s + react to embed widget activity in other tabs
   useEffect(() => {
     const id = setInterval(() => {
       refreshFromStorage();
@@ -42,15 +43,17 @@ export default function Dashboard() {
   const totalMessages = useMemo(() => agents.reduce((s, a) => s + a.messages, 0), [agents]);
   const totalConversations = useMemo(() => agents.reduce((s, a) => s + a.conversations, 0), [agents]);
   const activeAgents = useMemo(() => agents.filter((a) => a.active), [agents]);
+  const weekTotal = useMemo(() => weeklyData.reduce((s, d) => s + d.value, 0), [weeklyData]);
 
   const stats = [
-    { label: "Total Agents", value: String(agents.length), trend: agents.length > 0 ? `${activeAgents.length} active` : "Create your first", up: true, icon: Bot, accent: "bg-primary/10 text-primary" },
-    { label: "Total Messages", value: totalMessages.toLocaleString(), trend: "Live", up: true, icon: MessageSquare, accent: "bg-success/10 text-success" },
-    { label: "Conversations", value: totalConversations.toLocaleString(), trend: "Live", up: true, icon: MessagesSquare, accent: "bg-info/10 text-info" },
-    { label: "Avg Response Time", value: "1.2s", trend: "-0.3s improvement", up: false, icon: Clock, accent: "bg-warning/10 text-warning" },
+    { label: "Total agents", value: String(agents.length), trend: agents.length > 0 ? `${activeAgents.length} active` : "Create your first", up: true, icon: Bot, tint: "text-primary bg-primary/10" },
+    { label: "Total messages", value: totalMessages.toLocaleString(), trend: "Live", up: true, icon: MessageSquare, tint: "text-success bg-success/10" },
+    { label: "Conversations", value: totalConversations.toLocaleString(), trend: "Live", up: true, icon: MessagesSquare, tint: "text-info bg-info/10" },
+    { label: "Avg response", value: "1.2s", trend: "0.3s faster", up: false, icon: Clock, tint: "text-warning bg-warning/10" },
   ];
 
   const updatedAgo = Math.max(0, Math.floor((Date.now() - lastUpdated) / 1000));
+  const greeting = new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening";
 
   return (
     <>
@@ -58,22 +61,24 @@ export default function Dashboard() {
       <div className="p-4 sm:p-6 space-y-5">
         {/* Welcome banner */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-xl p-5 border border-primary/10"
+          transition={{ duration: 0.5, ease: EASE }}
+          className="relative overflow-hidden rounded-2xl border border-border bg-[#0B0E14] p-6"
         >
-          <div className="flex items-center justify-between">
+          <div className="absolute inset-0 bg-grid-dark opacity-50" aria-hidden />
+          <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-primary/25 blur-[90px]" aria-hidden />
+          <div className="relative flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-bold text-foreground mb-1">Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}! 👋</h2>
-              <p className="text-sm text-foreground-secondary">Here's what's happening with your AI agents today.</p>
-              <p className="text-[10px] text-foreground-muted mt-1">Last updated: {updatedAgo < 5 ? "just now" : `${updatedAgo}s ago`}</p>
+              <h2 className="text-[20px] font-extrabold text-white display">Good {greeting}</h2>
+              <p className="text-[13.5px] text-white/60 mt-1">Here's how your AI agents are performing today.</p>
+              <p className="text-[11px] text-white/40 mt-2">Updated {updatedAgo < 5 ? "just now" : `${updatedAgo}s ago`}</p>
             </div>
             <button
               onClick={() => navigate("/agents/create")}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity shadow-sm"
+              className="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-full text-[13.5px] font-semibold hover:bg-[#CF4F2C] transition-colors shadow-brand shrink-0"
             >
-              <Plus size={16} />
-              New Agent
+              <Plus size={16} /> New agent
             </button>
           </div>
         </motion.div>
@@ -87,16 +92,16 @@ export default function Dashboard() {
               initial="hidden"
               animate="visible"
               variants={cardVariant}
-              className="stat-card"
+              className="rounded-2xl border border-border bg-card p-5 hover:shadow-premium transition-shadow"
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-foreground-muted font-medium">{s.label}</span>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.accent}`}>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[12px] text-foreground-muted font-medium">{s.label}</span>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${s.tint}`}>
                   <s.icon size={16} />
                 </div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-foreground mb-1">{s.value}</div>
-              <div className={`flex items-center gap-1 text-[11px] font-medium ${s.up ? "text-success" : "text-info"}`}>
+              <div className="text-2xl font-extrabold text-foreground display">{s.value}</div>
+              <div className={`mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium ${s.up ? "text-success" : "text-info"}`}>
                 {s.up ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
                 {s.trend}
               </div>
@@ -109,26 +114,29 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="lg:col-span-2 glass-card p-5"
+            transition={{ delay: 0.25 }}
+            className="lg:col-span-2 rounded-2xl border border-border bg-card p-5"
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-foreground">Weekly Messages</h3>
-              <span className="text-[11px] text-foreground-muted bg-secondary px-2.5 py-1 rounded-md">Last 7 days</span>
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-[14px] font-bold text-foreground">Weekly messages</h3>
+                <p className="text-[12px] text-foreground-muted mt-0.5">{weekTotal.toLocaleString()} in the last 7 days</p>
+              </div>
+              <span className="text-[11px] text-foreground-secondary bg-secondary px-2.5 py-1 rounded-full font-medium">Last 7 days</span>
             </div>
-            <div className="flex items-end gap-2 sm:gap-3 h-40">
+            <div className="flex items-end gap-2 sm:gap-3 h-44">
               {weeklyData.map((d, i) => (
-                <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5">
-                  <span className="text-[10px] text-foreground-muted font-medium">{d.value}</span>
+                <div key={d.date} className="flex-1 flex flex-col items-center gap-2 group">
+                  <span className={`text-[11px] font-bold tabular-nums ${i === todayIndex ? "text-primary" : "text-foreground-secondary"}`}>
+                    {d.value.toLocaleString()}
+                  </span>
                   <motion.div
                     key={`${d.date}-${d.value}`}
                     initial={{ height: 0 }}
                     animate={{ height: `${(d.value / maxVal) * 100}%` }}
-                    transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
-                    className={`w-full rounded-t-md min-h-[4px] ${
-                      i === todayIndex
-                        ? "bg-gradient-to-t from-primary/80 to-primary"
-                        : "bg-primary/15 hover:bg-primary/25 transition-colors"
+                    transition={{ delay: 0.3 + i * 0.05, duration: 0.55, ease: EASE }}
+                    className={`w-full rounded-md min-h-[4px] ${
+                      i === todayIndex ? "bg-primary" : "bg-primary/20 group-hover:bg-primary/35 transition-colors"
                     }`}
                   />
                   <span className={`text-[10px] font-medium ${i === todayIndex ? "text-primary" : "text-foreground-muted"}`}>{d.day}</span>
@@ -140,43 +148,44 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass-card p-5"
+            transition={{ delay: 0.35 }}
+            className="rounded-2xl border border-border bg-card p-5"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-foreground">Active Agents</h3>
-              <button onClick={() => navigate("/agents/create")} className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-foreground-muted hover:text-primary">
-                <Plus size={16} />
+              <h3 className="text-[14px] font-bold text-foreground">Active agents</h3>
+              <button onClick={() => navigate("/agents")} className="text-[11px] text-foreground-muted hover:text-primary transition-colors inline-flex items-center gap-1">
+                View all <ArrowUpRight size={12} />
               </button>
             </div>
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               {activeAgents.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Bot size={24} className="text-primary" />
+                <div className="text-center py-10">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Bot size={22} className="text-primary" />
                   </div>
-                  <p className="text-xs text-foreground-muted mb-3">No active agents</p>
+                  <p className="text-[12px] text-foreground-muted mb-3">No active agents yet</p>
                   <button
                     onClick={() => navigate("/agents/create")}
-                    className="text-xs text-primary font-medium hover:underline inline-flex items-center gap-1"
+                    className="text-[12px] text-primary font-semibold hover:underline inline-flex items-center gap-1"
                   >
                     Create your first <ArrowRight size={12} />
                   </button>
                 </div>
               ) : (
-                activeAgents.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer" onClick={() => navigate(`/agents/edit/${a.id}`)}>
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold" style={{ backgroundColor: a.color + "20", color: a.color }}>
-                      {a.name[0]}
+                activeAgents.slice(0, 6).map((a) => (
+                  <div
+                    key={a.id}
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/60 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/agents/edit/${a.id}`)}
+                  >
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0" style={{ backgroundColor: a.color + "20", color: a.color }}>
+                      {a.name[0]?.toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-foreground truncate">{a.name}</div>
-                      <div className="text-[10px] text-foreground-muted">{a.messages.toLocaleString()} msgs · {a.conversations} convs</div>
+                      <div className="text-[13px] font-semibold text-foreground truncate">{a.name}</div>
+                      <div className="text-[11px] text-foreground-muted">{a.messages.toLocaleString()} msgs · {a.conversations} convs</div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-secondary text-foreground-secondary font-medium">{a.model}</span>
-                      <span className="w-2 h-2 rounded-full bg-success" />
-                    </div>
+                    <span className="w-2 h-2 rounded-full bg-success shrink-0" />
                   </div>
                 ))
               )}
@@ -184,16 +193,19 @@ export default function Dashboard() {
           </motion.div>
         </div>
 
-        {/* India banner */}
+        {/* Insight card */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="glass-card p-4 flex items-center gap-3"
+          transition={{ delay: 0.45 }}
+          className="rounded-2xl border border-border bg-card p-5 flex items-center gap-4"
         >
-          <span className="text-2xl">🇮🇳</span>
-          <p className="text-xs text-foreground-secondary">
-            Your agents served <span className="text-primary font-semibold">{totalMessages.toLocaleString()} users</span> across India this week — top cities: Mumbai, Bengaluru, Delhi, Hyderabad
+          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <TrendingUp size={20} className="text-primary" />
+          </div>
+          <p className="text-[13px] text-foreground-secondary leading-relaxed">
+            Your agents handled <span className="text-foreground font-semibold">{totalMessages.toLocaleString()} messages</span> across{" "}
+            <span className="text-foreground font-semibold">{totalConversations.toLocaleString()} conversations</span>. Keep your knowledge base fresh to push resolution rates even higher.
           </p>
         </motion.div>
       </div>

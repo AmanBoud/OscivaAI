@@ -32,16 +32,35 @@ async function refreshWeek() {
   }
   const start = new Date();
   start.setDate(start.getDate() - 6);
-  const startIso = start.toISOString().slice(0, 10);
-  const { data } = await supabase
-    .from("daily_stats")
-    .select("stat_date, message_count")
-    .eq("user_id", user.id)
-    .gte("stat_date", startIso);
+  start.setHours(0, 0, 0, 0);
+
+  // Real, live source of truth: actual logged messages from visitor chats.
+  // (RLS scopes conversation_messages to conversations the user owns.)
+  const { data, error } = await supabase
+    .from("conversation_messages")
+    .select("created_at")
+    .gte("created_at", start.toISOString())
+    .limit(10000);
+
   const totals: Record<string, number> = {};
-  (data ?? []).forEach((row: any) => {
-    totals[row.stat_date] = (totals[row.stat_date] ?? 0) + (row.message_count ?? 0);
-  });
+  if (!error && data) {
+    data.forEach((row: any) => {
+      const key = new Date(row.created_at).toISOString().slice(0, 10);
+      totals[key] = (totals[key] ?? 0) + 1;
+    });
+  } else {
+    // Fallback to daily_stats if logging table isn't available yet.
+    const startIso = start.toISOString().slice(0, 10);
+    const { data: ds } = await supabase
+      .from("daily_stats")
+      .select("stat_date, message_count")
+      .eq("user_id", user.id)
+      .gte("stat_date", startIso);
+    (ds ?? []).forEach((row: any) => {
+      totals[row.stat_date] = (totals[row.stat_date] ?? 0) + (row.message_count ?? 0);
+    });
+  }
+
   cachedWeek = seedEmptyWeek().map((d) => ({ ...d, value: totals[d.date] ?? 0 }));
   window.dispatchEvent(new CustomEvent("osciva-stats-updated"));
 }
