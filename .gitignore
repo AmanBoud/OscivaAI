@@ -19,6 +19,8 @@ dist-ssr
 # Internal working docs / deploy helpers — keep local only
 PROGRESS.md
 BUILD_PROMPT.md
+ROADMAP.md
+SCALING.md
 supabase/DEPLOY_ALL.sql
 
 # Editor directories and files

@@ -283,11 +283,26 @@ Deno.serve(async (req) => {
       if (lastUser?.content) {
         try {
           const qEmb = await embed(lastUser.content);
-          const { data: chunks } = await admin.rpc("match_agent_chunks", {
+          // Hybrid retrieval: semantic (vector) + lexical (full-text), fused via
+          // RRF — so exact keywords AND paraphrases both hit. Falls back to the
+          // pure-vector RPC if the hybrid migration isn't deployed yet.
+          let chunks: { content: string }[] | null = null;
+          const hybrid = await admin.rpc("match_agent_chunks_hybrid", {
             p_agent_id: agentId,
             p_query_embedding: qEmb,
+            p_query_text: lastUser.content,
             p_match_count: 6,
           });
+          if (hybrid.error) {
+            const fallback = await admin.rpc("match_agent_chunks", {
+              p_agent_id: agentId,
+              p_query_embedding: qEmb,
+              p_match_count: 6,
+            });
+            chunks = fallback.data;
+          } else {
+            chunks = hybrid.data;
+          }
           if (chunks?.length) context = chunks.map((c: { content: string }) => c.content).join("\n---\n");
         } catch (_e) {
           // retrieval failure shouldn't break chat
