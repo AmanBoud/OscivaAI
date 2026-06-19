@@ -30,6 +30,9 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 type Provider = "OpenAI" | "Anthropic" | "Google AI" | "OpenRouter";
 type Msg = { role: string; content: string };
 
+// Max visitor messages per agent per hour (per IP) when rate limiting is on.
+const RATE_LIMIT_PER_HOUR = 20;
+
 // Friendly model aliases -> real provider model ids
 const OPENAI_MODELS: Record<string, string> = { "gpt-4o": "gpt-4o", "gpt-4o-mini": "gpt-4o-mini" };
 const ANTHROPIC_MODELS: Record<string, string> = {
@@ -302,6 +305,24 @@ Deno.serve(async (req) => {
 
       const { data: agent } = await admin.from("agents").select("*").eq("id", agentId).maybeSingle();
       if (!agent || !agent.active) return json({ error: "Agent not found" }, 404);
+
+      // Rate limiting — protects the owner's LLM spend from abuse/bots.
+      // On by default (only an explicit `false` disables it). Skipped for the
+      // owner's own Live-Test chats (test:true). Keyed by visitor IP + agent.
+      if (agent.rate_limit_enabled !== false && !test) {
+        const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+        const { data: hits } = await admin.rpc("bump_rate_limit", {
+          p_agent_id: agentId,
+          p_client_id: ip,
+          p_window_seconds: 3600,
+        });
+        if (typeof hits === "number" && hits > RATE_LIMIT_PER_HOUR) {
+          return json(
+            { reply: "You've reached the message limit for now — please try again later. 🙏", error: "rate_limited", conversationId: null },
+            429,
+          );
+        }
+      }
 
       // RAG retrieval for the latest user question
       const lastUser = [...messages].reverse().find((m: Msg) => m.role === "user");
