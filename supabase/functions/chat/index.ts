@@ -316,7 +316,8 @@ Deno.serve(async (req) => {
           p_client_id: ip,
           p_window_seconds: 3600,
         });
-        if (typeof hits === "number" && hits > RATE_LIMIT_PER_HOUR) {
+        const limit = Number(agent.rate_limit_per_hour) > 0 ? Number(agent.rate_limit_per_hour) : RATE_LIMIT_PER_HOUR;
+        if (typeof hits === "number" && hits > limit) {
           return json(
             { reply: "You've reached the message limit for now — please try again later. 🙏", error: "rate_limited", conversationId: null },
             429,

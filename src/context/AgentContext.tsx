@@ -31,6 +31,7 @@ export interface Agent {
   chunks: AgentChunk[];
   passwordEnabled: boolean;
   rateLimitEnabled: boolean;
+  rateLimitPerHour: number;
   domains: string[];
   messages: number;
   conversations: number;
@@ -88,6 +89,7 @@ function rowToAgent(
     chunks: agentChunks,
     passwordEnabled: row.password_enabled,
     rateLimitEnabled: row.rate_limit_enabled,
+    rateLimitPerHour: row.rate_limit_per_hour ?? 20,
     domains: row.domains ?? [],
     messages: row.message_count ?? 0,
     conversations: row.conversation_count ?? 0,
@@ -170,6 +172,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
         suggestions: agent.suggestions,
         password_enabled: agent.passwordEnabled,
         rate_limit_enabled: agent.rateLimitEnabled,
+        rate_limit_per_hour: agent.rateLimitPerHour,
         domains: agent.domains,
         active: agent.active,
       })
@@ -231,6 +234,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     if (data.suggestions !== undefined) patch.suggestions = data.suggestions;
     if (data.passwordEnabled !== undefined) patch.password_enabled = data.passwordEnabled;
     if (data.rateLimitEnabled !== undefined) patch.rate_limit_enabled = data.rateLimitEnabled;
+    if (data.rateLimitPerHour !== undefined) patch.rate_limit_per_hour = data.rateLimitPerHour;
     if (data.domains !== undefined) patch.domains = data.domains;
     if (data.active !== undefined) patch.active = data.active;
     if (Object.keys(patch).length) {

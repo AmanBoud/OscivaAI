@@ -91,6 +91,7 @@ export default function CreateAgent() {
   const [position, setPosition] = useState<"left" | "right">(existingAgent?.position ?? "right");
   const [passwordEnabled, setPasswordEnabled] = useState(existingAgent?.passwordEnabled ?? false);
   const [rateLimitEnabled, setRateLimitEnabled] = useState(existingAgent?.rateLimitEnabled ?? true);
+  const [rateLimitPerHour, setRateLimitPerHour] = useState(existingAgent?.rateLimitPerHour ?? 20);
   const [domains, setDomains] = useState<string[]>(existingAgent?.domains ?? []);
   const [newDomain, setNewDomain] = useState("");
   const [urlInput, setUrlInput] = useState("");
@@ -303,6 +304,7 @@ export default function CreateAgent() {
       chunks,
       passwordEnabled,
       rateLimitEnabled,
+      rateLimitPerHour,
       domains,
     };
 
@@ -822,7 +824,7 @@ export default function CreateAgent() {
                   <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
                     <div>
                       <div className="text-xs font-semibold text-foreground">Rate Limiting</div>
-                      <div className="text-[10px] text-foreground-muted">20 messages/user/hour</div>
+                      <div className="text-[10px] text-foreground-muted">Caps messages per visitor each hour — protects your API costs.</div>
                     </div>
                     <button
                       onClick={() => setRateLimitEnabled(!rateLimitEnabled)}
@@ -831,6 +833,22 @@ export default function CreateAgent() {
                       <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-foreground transition-all ${rateLimitEnabled ? "left-5" : "left-0.5"}`} />
                     </button>
                   </div>
+                  {rateLimitEnabled && (
+                    <div className="flex items-center justify-between gap-3 p-3 bg-secondary/30 rounded-lg">
+                      <label className="text-xs text-foreground-secondary">
+                        Messages per visitor / hour
+                        <span className="block text-[10px] text-foreground-muted">A visitor who exceeds this is asked to try again later.</span>
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={1000}
+                        value={rateLimitPerHour}
+                        onChange={(e) => setRateLimitPerHour(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
+                        className="w-20 px-3 py-2 rounded-lg bg-secondary border border-border text-sm text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
+                  )}
                   <div>
                     <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Domain Whitelist</label>
                     <div className="flex gap-2 mb-2">

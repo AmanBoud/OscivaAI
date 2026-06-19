@@ -208,6 +208,7 @@ export type Database = {
           personality: string
           position: string
           rate_limit_enabled: boolean
+          rate_limit_per_hour: number
           suggestions: string[]
           updated_at: string
           user_id: string
@@ -230,6 +231,7 @@ export type Database = {
           personality?: string
           position?: string
           rate_limit_enabled?: boolean
+          rate_limit_per_hour?: number
           suggestions?: string[]
           updated_at?: string
           user_id: string
@@ -252,6 +254,7 @@ export type Database = {
           personality?: string
           position?: string
           rate_limit_enabled?: boolean
+          rate_limit_per_hour?: number
           suggestions?: string[]
           updated_at?: string
           user_id?: string
