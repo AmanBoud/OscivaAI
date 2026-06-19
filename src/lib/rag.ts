@@ -220,14 +220,40 @@ export function retrieveTopChunks(query: string, chunks: KbChunk[], k = 3): KbCh
   return scored.filter((s) => s.score > 0).slice(0, k).map((s) => s.chunk);
 }
 
+// Maps a personality id to a concrete tone directive the model can act on.
+// (Mirrors the deployed chat function's PERSONALITY_TONES.)
+export const PERSONALITY_TONES: Record<string, string> = {
+  professional: "Maintain a professional, formal, and precise tone.",
+  friendly: "Be warm, friendly, and approachable.",
+  concise: "Be brief and to the point — keep answers short.",
+  expert: "Respond like a knowledgeable domain expert, with depth and authority.",
+  empathetic: "Be understanding, caring, and empathetic.",
+  playful: "Be fun, playful, and engaging.",
+};
+
 export function buildRagSystemPrompt(opts: {
   agentName: string;
   instructions: string;
   personality: string;
   contextChunks: KbChunk[];
 }): string {
-  const base = `You are ${opts.agentName || "an AI assistant"}. Personality: ${opts.personality}.\n\n${opts.instructions}`;
-  if (!opts.contextChunks.length) return base;
+  const instructions = (opts.instructions || "").trim();
+  const tone = PERSONALITY_TONES[opts.personality] ?? `Adopt a ${opts.personality} tone.`;
+  // Owner instructions are the authoritative behaviour spec — fenced and
+  // explicitly prioritised so the model follows them over generic defaults.
+  // (Mirrors the deployed chat function's buildSystemPrompt.)
+  const head =
+    `You are ${opts.agentName || "an AI assistant"}. ${tone}\n\n` +
+    `=== OPERATING INSTRUCTIONS (set by the business owner) ===\n` +
+    `These are your rules. Follow them EXACTLY and in full. They take priority over your default ` +
+    `behaviour. Obey their tone, formatting, language, and any step-by-step or conditional rules. ` +
+    `Do not ignore, summarise, or deviate from them.\n\n` +
+    `${instructions || "(No specific instructions provided — be a helpful, friendly assistant for this business.)"}\n` +
+    `=== END OPERATING INSTRUCTIONS ===`;
+
+  if (!opts.contextChunks.length) return head;
   const ctx = opts.contextChunks.map((c) => c.text).join("\n---\n");
-  return `${base}\n\nUse the following knowledge base context to answer. If the answer is not in the context, say so clearly.\n\nCONTEXT:\n${ctx}`;
+  return `${head}\n\nKNOWLEDGE BASE (use this as your source of facts):\n${ctx}\n\n` +
+    `For factual questions use ONLY the knowledge base above; if the answer isn't there, say so ` +
+    `clearly. Never invent facts. This factual rule never overrides the OPERATING INSTRUCTIONS.`;
 }

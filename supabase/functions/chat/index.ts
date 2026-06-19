@@ -54,17 +54,43 @@ async function embed(text: string): Promise<number[]> {
   return (await session.run(text, { mean_pool: true, normalize: true })) as number[];
 }
 
+const PERSONALITY_TONES: Record<string, string> = {
+  professional: "Maintain a professional, formal, and precise tone.",
+  friendly: "Be warm, friendly, and approachable.",
+  concise: "Be brief and to the point — keep answers short.",
+  expert: "Respond like a knowledgeable domain expert, with depth and authority.",
+  empathetic: "Be understanding, caring, and empathetic.",
+  playful: "Be fun, playful, and engaging.",
+};
+
 function buildSystemPrompt(agent: Record<string, unknown>, context: string): string {
-  const base =
-    `You are ${(agent.name as string) || "an AI assistant"}, a helpful assistant for a business. ` +
-    `Personality: ${agent.personality}.\n${(agent.instructions as string) || ""}`;
-  if (!context) {
-    return `${base}\n\nYou currently have no knowledge base content. If asked something specific, ` +
-      `say you're not sure and offer to connect the user with the team. Never invent facts.`;
-  }
-  return `${base}\n\nAnswer ONLY from the business knowledge base below. If the answer is not there, ` +
-    `say you're not sure and offer to connect the user with the team. Never invent facts, prices, or ` +
-    `policies. Keep answers concise and friendly.\n\nKNOWLEDGE BASE:\n${context}`;
+  const name = (agent.name as string) || "an AI assistant";
+  const personality = (agent.personality as string) || "professional";
+  const tone = PERSONALITY_TONES[personality] ?? `Adopt a ${personality} tone.`;
+  const instructions = ((agent.instructions as string) || "").trim();
+
+  // The owner's instructions are the AUTHORITATIVE behaviour spec. They are
+  // fenced and explicitly prioritised so the model follows them over the
+  // platform's generic defaults below (which only act as a safety net).
+  const head =
+    `You are ${name}. ${tone}\n\n` +
+    `=== OPERATING INSTRUCTIONS (set by the business owner) ===\n` +
+    `These are your rules. Follow them EXACTLY and in full. They take priority over your\n` +
+    `default behaviour. Obey their tone, formatting, language, and any step-by-step or\n` +
+    `conditional rules they contain. Do not ignore, summarise, or deviate from them.\n\n` +
+    `${instructions || "(No specific instructions provided — be a helpful, friendly assistant for this business.)"}\n` +
+    `=== END OPERATING INSTRUCTIONS ===`;
+
+  const kb = context
+    ? `\n\nKNOWLEDGE BASE (the business's own information — use this as your source of facts):\n${context}\n\n` +
+      `When answering factual questions (prices, policies, names, dates, contacts), use ONLY the ` +
+      `knowledge base above. If the answer isn't there, say you're not sure and offer to connect the ` +
+      `user with the team. Never invent facts. This factual rule never overrides the OPERATING INSTRUCTIONS.`
+    : `\n\nYou currently have no knowledge base content. For specific factual questions, say you're not ` +
+      `sure and offer to connect the user with the team. Never invent facts. This never overrides the ` +
+      `OPERATING INSTRUCTIONS above.`;
+
+  return head + kb;
 }
 
 const toOpenAI = (m: Msg) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content) });

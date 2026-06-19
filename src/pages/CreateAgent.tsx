@@ -1,13 +1,13 @@
 import Topbar from "@/components/layout/Topbar";
 import { useState, useRef } from "react";
-import { Check, Upload, X, Plus, Send, RotateCcw, Sparkles, Copy, AlertCircle } from "lucide-react";
+import { Check, Upload, X, Plus, Send, RotateCcw, Sparkles, Copy, AlertCircle, Maximize2, Minimize2, ChevronDown, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAgents, Agent, AgentSource, AgentChunk } from "@/context/AgentContext";
 import { chatComplete, MissingApiKeyError, ChatMessage } from "@/lib/aiClient";
 import { extractPdfText, extractUrlText, chunkText, retrieveTopChunks, buildRagSystemPrompt } from "@/lib/rag";
 import { recordAgentActivity } from "@/lib/agentStats";
+import { PROMPT_TEMPLATES, PromptTemplate } from "@/lib/promptTemplates";
 
 const providers = [
   { id: "OpenAI", label: "OpenAI", emoji: "🟢", desc: "GPT-4o & GPT-4o Mini", badge: "bg-green-100 text-green-700" },
@@ -17,19 +17,43 @@ const providers = [
 ];
 
 const models = [
-  { id: "gpt-4o", name: "GPT-4o", desc: "Most capable model", provider: "OpenAI" },
-  { id: "gpt-4o-mini", name: "GPT-4o Mini", desc: "Fast and affordable", provider: "OpenAI" },
-  { id: "claude-sonnet", name: "Claude Sonnet 4", desc: "Best for analysis", provider: "Anthropic" },
-  { id: "claude-haiku", name: "Claude Haiku 4.5", desc: "Ultra-fast responses", provider: "Anthropic" },
-  { id: "gemini-flash", name: "Gemini 2.0 Flash", desc: "Google's fastest", provider: "Google" },
-  { id: "gemini-pro", name: "Gemini 2.5 Pro", desc: "Advanced reasoning", provider: "Google" },
+  // ---- OpenAI ----
+  { id: "gpt-4o", name: "GPT-4o", desc: "Flagship · vision + text", provider: "OpenAI" },
+  { id: "gpt-4o-mini", name: "GPT-4o Mini", desc: "Fast & affordable", provider: "OpenAI" },
+  { id: "gpt-4.1", name: "GPT-4.1", desc: "Smartest GPT-4 class", provider: "OpenAI" },
+  { id: "gpt-4.1-mini", name: "GPT-4.1 Mini", desc: "Balanced speed/cost", provider: "OpenAI" },
+  { id: "gpt-4.1-nano", name: "GPT-4.1 Nano", desc: "Cheapest, fastest", provider: "OpenAI" },
+  { id: "gpt-4-turbo", name: "GPT-4 Turbo", desc: "Previous flagship", provider: "OpenAI" },
+  { id: "o4-mini", name: "o4-mini", desc: "Reasoning · efficient", provider: "OpenAI" },
+  { id: "o3", name: "o3", desc: "Deep reasoning", provider: "OpenAI" },
+  // ---- Anthropic ----
+  { id: "claude-fable-5", name: "Claude Fable 5", desc: "Most capable model", provider: "Anthropic" },
+  { id: "claude-opus-4-8", name: "Claude Opus 4.8", desc: "Top-tier reasoning", provider: "Anthropic" },
+  { id: "claude-opus-4-7", name: "Claude Opus 4.7", desc: "Highly capable Opus", provider: "Anthropic" },
+  { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6", desc: "Best speed/intelligence", provider: "Anthropic" },
+  { id: "claude-haiku-4-5", name: "Claude Haiku 4.5", desc: "Fastest, most affordable", provider: "Anthropic" },
+  { id: "claude-sonnet", name: "Claude Sonnet (legacy)", desc: "Alias → Sonnet 4.6", provider: "Anthropic" },
+  { id: "claude-haiku", name: "Claude Haiku (legacy)", desc: "Alias → Haiku 4.5", provider: "Anthropic" },
+  // ---- Google ----
+  { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", desc: "Advanced reasoning", provider: "Google" },
+  { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", desc: "Fast & smart", provider: "Google" },
+  { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", desc: "Google's fastest", provider: "Google" },
+  { id: "gemini-2.0-flash-lite", name: "Gemini 2.0 Flash-Lite", desc: "Lightest & cheapest", provider: "Google" },
+  { id: "gemini-flash", name: "Gemini Flash (legacy)", desc: "Alias → 2.0 Flash", provider: "Google" },
+  { id: "gemini-pro", name: "Gemini Pro (legacy)", desc: "Alias → 2.5 Pro", provider: "Google" },
+  // ---- OpenRouter (open-source & multi-vendor) ----
   { id: "meta-llama/llama-3.3-70b-instruct", name: "Llama 3.3 70B", desc: "Meta · open-source flagship", provider: "OpenRouter" },
-  { id: "mistralai/mistral-large", name: "Mistral Large", desc: "Mistral · strong reasoning", provider: "OpenRouter" },
   { id: "deepseek/deepseek-chat", name: "DeepSeek V3", desc: "DeepSeek · cheap & smart", provider: "OpenRouter" },
+  { id: "deepseek/deepseek-r1", name: "DeepSeek R1", desc: "DeepSeek · reasoning", provider: "OpenRouter" },
+  { id: "mistralai/mistral-large", name: "Mistral Large", desc: "Mistral · strong reasoning", provider: "OpenRouter" },
   { id: "qwen/qwen-2.5-72b-instruct", name: "Qwen 2.5 72B", desc: "Alibaba · multilingual", provider: "OpenRouter" },
+  { id: "x-ai/grok-2", name: "Grok 2", desc: "xAI · conversational", provider: "OpenRouter" },
   { id: "openrouter/auto", name: "OpenRouter Auto", desc: "Auto-route to best model", provider: "OpenRouter" },
   { id: "__custom_openrouter__", name: "Custom model…", desc: "Paste any OpenRouter slug", provider: "OpenRouter" },
 ];
+
+const DEFAULT_INSTRUCTIONS =
+  "You are a helpful customer support assistant for our company. Answer questions based on the provided knowledge base.";
 
 const personalities = [
   { id: "professional", name: "Professional", desc: "Formal and precise" },
@@ -49,14 +73,14 @@ export default function CreateAgent() {
 
   const [tab, setTab] = useState(0);
   const [name, setName] = useState(existingAgent?.name ?? "");
-  const [instructions, setInstructions] = useState(existingAgent?.instructions ?? "You are a helpful customer support assistant for our company. Answer questions based on the provided knowledge base.");
-  const initialModel = existingAgent?.model ?? "gpt-4o";
-  const isPresetModel = models.some((m) => m.id === initialModel);
-  const [selectedModel, setSelectedModel] = useState(isPresetModel ? initialModel : "__custom_openrouter__");
-  const [customModel, setCustomModel] = useState(isPresetModel ? "" : initialModel);
+  const [instructions, setInstructions] = useState(existingAgent?.instructions ?? DEFAULT_INSTRUCTIONS);
+  const initialModel = existingAgent?.model ?? "";
+  const isPresetModel = !!initialModel && models.some((m) => m.id === initialModel);
+  const [selectedModel, setSelectedModel] = useState(
+    initialModel ? (isPresetModel ? initialModel : "__custom_openrouter__") : ""
+  );
+  const [customModel, setCustomModel] = useState(initialModel && !isPresetModel ? initialModel : "");
   const effectiveModel = selectedModel === "__custom_openrouter__" ? customModel.trim() : selectedModel;
-  const initialProvider = models.find((m) => m.id === (isPresetModel ? initialModel : "__custom_openrouter__"))?.provider ?? "OpenAI";
-  const [selectedProvider, setSelectedProvider] = useState<string>(initialProvider);
   const [personality, setPersonality] = useState(existingAgent?.personality ?? "professional");
   const [sources, setSources] = useState<AgentSource[]>(existingAgent?.sources ?? []);
   const [chunks, setChunks] = useState<AgentChunk[]>(existingAgent?.chunks ?? []);
@@ -75,6 +99,12 @@ export default function CreateAgent() {
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [widgetOpen, setWidgetOpen] = useState(true);
+  const [instructionsExpanded, setInstructionsExpanded] = useState(false);
+  const [refining, setRefining] = useState(false);
+  const [modelSearch, setModelSearch] = useState("");
+  const [modelFilter, setModelFilter] = useState<string>("All");
+  const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const [personalityOpen, setPersonalityOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -158,6 +188,58 @@ export default function CreateAgent() {
     }
   };
 
+  const DEFAULT_WELCOME = "Hi 👋 How can I help you today?";
+  const DEFAULT_SUGGESTIONS = ["What services do you offer?", "How can I contact support?"];
+
+  const applyTemplate = (tpl: PromptTemplate) => {
+    const current = instructions.trim();
+    const isUntouched = current === "" || current === DEFAULT_INSTRUCTIONS;
+    if (!isUntouched && !window.confirm("Replace your current System Instructions with the " + tpl.label + " template? Your existing text will be overwritten.")) {
+      return;
+    }
+    setInstructions(tpl.prompt);
+    // Only fill welcome/suggestions if the user hasn't customised them yet.
+    if (tpl.welcomeMsg && welcomeMsg.trim() === DEFAULT_WELCOME) setWelcomeMsg(tpl.welcomeMsg);
+    if (tpl.suggestions && JSON.stringify(suggestions) === JSON.stringify(DEFAULT_SUGGESTIONS)) {
+      setSuggestions(tpl.suggestions);
+    }
+    toast.success(`${tpl.emoji} ${tpl.label} template applied — fill in the [BRACKETS]`);
+  };
+
+  const refineInstructions = async () => {
+    const current = instructions.trim();
+    if (current.length < 20) {
+      toast.error("Write a bit of your prompt first — then I'll clean it up.");
+      return;
+    }
+    if (refining) return;
+    setRefining(true);
+    try {
+      const metaSystem =
+        "You are a prompt engineer. You rewrite a chatbot's system prompt to be clean, " +
+        "well-structured, and easy for an LLM to follow. RULES: (1) Preserve ALL of the user's " +
+        "intent, rules, facts, names, contact details, links, and placeholders like [BRACKETS] — " +
+        "never drop or invent information. (2) Organise it with clear section headings and short " +
+        "bullet points. (3) Keep it concise — remove repetition and filler. (4) Keep the same " +
+        "language. (5) Output ONLY the rewritten system prompt — no preamble, no explanation, no code fences.";
+      const refined = await chatComplete(effectiveModel, metaSystem, [
+        { role: "user", content: `Clean up and structure this system prompt:\n\n${current}` },
+      ]);
+      const cleaned = (refined || "").trim().replace(/^```[a-z]*\n?|\n?```$/g, "").trim();
+      if (!cleaned) throw new Error("Empty response");
+      setInstructions(cleaned);
+      toast.success("✨ Prompt refined — review the result");
+    } catch (err) {
+      if (err instanceof MissingApiKeyError) {
+        toast.error(`Add your ${err.provider} API key in Settings → API Keys to use AI refine`);
+      } else {
+        toast.error(`Refine failed: ${err instanceof Error ? err.message : "unknown error"}`);
+      }
+    } finally {
+      setRefining(false);
+    }
+  };
+
   const sendChatMessage = async () => {
     if (!chatInput.trim() || chatLoading) return;
     const userMsg = chatInput.trim();
@@ -195,6 +277,10 @@ export default function CreateAgent() {
   const handleSave = async () => {
     if (!name.trim()) {
       toast.error("Please enter an agent name");
+      return;
+    }
+    if (!effectiveModel) {
+      toast.error("Please select an AI model");
       return;
     }
     if (selectedModel === "__custom_openrouter__" && !customModel.trim()) {
@@ -249,6 +335,218 @@ export default function CreateAgent() {
   return (
     <>
       <Topbar title={existingAgent ? "Edit Agent" : "Create Agent"} subtitle="Configure your AI agent" />
+
+      {/* Expanded System Instructions editor */}
+      {instructionsExpanded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-up" onClick={() => setInstructionsExpanded(false)}>
+          <div className="glass-card w-full max-w-3xl h-[85vh] flex flex-col p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <div>
+                <h3 className="text-sm font-bold text-foreground">System Instructions</h3>
+                <p className="text-[10px] text-foreground-muted">Tell your AI how to behave. Replace every <span className="font-mono text-primary">[BRACKET]</span> with your details.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInstructionsExpanded(false)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-[#CF4F2C] transition-colors"
+              >
+                <Minimize2 size={12} /> Done
+              </button>
+            </div>
+
+            {/* Template chips */}
+            <div className="flex items-center gap-1.5 mb-3 flex-wrap shrink-0">
+              <span className="text-[10px] text-foreground-muted flex items-center gap-0.5"><Sparkles size={11} className="text-primary" /> Start from a template:</span>
+              {PROMPT_TEMPLATES.map((tpl) => (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => applyTemplate(tpl)}
+                  title={`${tpl.label} — ${tpl.desc}`}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary border border-border text-[10px] font-medium text-foreground-secondary hover:border-primary/50 hover:bg-primary/5 hover:text-foreground transition-all"
+                >
+                  <span>{tpl.emoji}</span>
+                  <span>{tpl.label}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="relative flex-1 min-h-0">
+              <textarea
+                value={instructions}
+                onChange={(e) => setInstructions(e.target.value)}
+                autoFocus
+                placeholder="Write your system prompt here, or pick a template above…"
+                className="absolute inset-0 w-full h-full px-4 py-3 pb-12 rounded-lg bg-secondary border border-border text-sm leading-relaxed text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none font-mono"
+              />
+              {/* AI refine — bottom corner */}
+              <button
+                type="button"
+                onClick={refineInstructions}
+                disabled={refining}
+                title="Clean up & structure your prompt with AI (keeps all your details)"
+                className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold shadow-lg hover:bg-[#CF4F2C] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {refining ? (
+                  <>
+                    <RotateCcw size={12} className="animate-spin" /> Refining…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={12} /> Refine with AI
+                  </>
+                )}
+              </button>
+            </div>
+            <div className="flex justify-between mt-2 shrink-0">
+              <span className="text-[10px] text-foreground-muted">💡 Messy prompt? Hit <span className="text-primary font-medium">Refine with AI</span> to clean &amp; structure it — your details are kept.</span>
+              <span className="text-[10px] text-foreground-muted">{instructions.length} chars</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Model picker */}
+      {modelPickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-up" onClick={() => setModelPickerOpen(false)}>
+          <div className="glass-card w-full max-w-2xl max-h-[85vh] flex flex-col p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <div>
+                <h3 className="text-sm font-bold text-foreground">Choose a model</h3>
+                <p className="text-[10px] text-foreground-muted">Uses your own API key for the provider — add keys in Settings → API Keys.</p>
+              </div>
+              <button type="button" onClick={() => setModelPickerOpen(false)} className="p-1.5 rounded-lg hover:bg-secondary text-foreground-muted hover:text-foreground">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="relative mb-2 shrink-0">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-muted" />
+              <input
+                value={modelSearch}
+                onChange={(e) => setModelSearch(e.target.value)}
+                autoFocus
+                placeholder="Search models…"
+                className="w-full pl-9 pr-3.5 py-2 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+            {/* Provider filter */}
+            <div className="flex flex-wrap gap-1.5 mb-3 shrink-0">
+              {["All", ...providers.map((p) => p.id)].map((f) => {
+                const meta = providers.find((p) => p.id === f);
+                return (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setModelFilter(f)}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
+                      modelFilter === f
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-secondary text-foreground-secondary border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {meta?.emoji} {meta?.label ?? "All"}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-2 gap-1.5 overflow-y-auto p-0.5 flex-1 min-h-0">
+              {models
+                .filter((m) => {
+                  const matchProvider = modelFilter === "All" || m.provider === modelFilter;
+                  const q = modelSearch.trim().toLowerCase();
+                  const matchSearch = !q || m.name.toLowerCase().includes(q) || m.id.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q);
+                  return matchProvider && matchSearch;
+                })
+                .map((m) => {
+                  const meta = providers.find((p) => p.id === m.provider);
+                  const active = selectedModel === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedModel(m.id);
+                        if (m.id !== "__custom_openrouter__") setModelPickerOpen(false);
+                      }}
+                      className={`text-left p-2.5 rounded-lg border transition-all ${
+                        active
+                          ? "border-primary bg-primary/10 ring-1 ring-primary/40"
+                          : "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
+                        <span className="text-[12px] font-semibold text-foreground truncate">{m.name}</span>
+                        {active && <Check size={12} className="text-primary shrink-0" />}
+                      </div>
+                      <div className="text-[9px] text-foreground-muted truncate mb-1">{m.desc}</div>
+                      <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-medium ${meta?.badge ?? "bg-secondary text-foreground-muted"}`}>
+                        {meta?.emoji} {meta?.label}
+                      </span>
+                    </button>
+                  );
+                })}
+            </div>
+
+            {selectedModel === "__custom_openrouter__" && (
+              <div className="mt-3 shrink-0">
+                <input
+                  value={customModel}
+                  onChange={(e) => setCustomModel(e.target.value)}
+                  placeholder="e.g. meta-llama/llama-3.1-8b-instruct"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <p className="text-[10px] text-foreground-muted mt-1">
+                  Paste any slug from <a href="https://openrouter.ai/models" target="_blank" rel="noopener" className="text-primary hover:underline">openrouter.ai/models</a>, then close.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Personality picker */}
+      {personalityOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-up" onClick={() => setPersonalityOpen(false)}>
+          <div className="glass-card w-full max-w-md max-h-[85vh] flex flex-col p-5" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3 shrink-0">
+              <div>
+                <h3 className="text-sm font-bold text-foreground">Choose a personality</h3>
+                <p className="text-[10px] text-foreground-muted">Sets the tone your agent replies in.</p>
+              </div>
+              <button type="button" onClick={() => setPersonalityOpen(false)} className="p-1.5 rounded-lg hover:bg-secondary text-foreground-muted hover:text-foreground">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 overflow-y-auto p-0.5">
+              {personalities.map((p) => {
+                const active = personality === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => { setPersonality(p.id); setPersonalityOpen(false); }}
+                    className={`text-left p-2.5 rounded-lg border transition-all ${
+                      active
+                        ? "border-primary bg-primary/10 ring-1 ring-primary/40"
+                        : "border-border bg-card hover:border-primary/50 hover:bg-primary/5"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-1 mb-0.5">
+                      <span className="text-[12px] font-semibold text-foreground truncate">{p.name}</span>
+                      {active && <Check size={12} className="text-primary shrink-0" />}
+                    </div>
+                    <div className="text-[9px] text-foreground-muted truncate">{p.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="p-6 animate-fade-up">
         {/* Agent ID bar */}
         {existingAgent && (
@@ -295,84 +593,75 @@ export default function CreateAgent() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">System Instructions</label>
-                    <textarea
-                      value={instructions}
-                      onChange={(e) => setInstructions(e.target.value)}
-                      rows={4}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
-                      style={{ minHeight: 110 }}
-                    />
+                    <div className="flex items-center justify-between mb-1.5 gap-2">
+                      <label className="text-xs font-semibold text-foreground-secondary">System Instructions</label>
+                      <button
+                        type="button"
+                        onClick={() => setInstructionsExpanded(true)}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary border border-border text-[10px] font-medium text-foreground-secondary hover:border-primary/50 hover:text-foreground transition-all"
+                      >
+                        <Maximize2 size={11} /> Expand & edit
+                      </button>
+                    </div>
+                    <div
+                      onClick={() => setInstructionsExpanded(true)}
+                      className={`w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border cursor-pointer hover:border-primary/40 transition-all overflow-hidden whitespace-pre-wrap ${
+                        instructions.trim()
+                          ? "text-xs leading-relaxed text-foreground-muted font-mono"
+                          : "text-sm text-foreground-muted"
+                      }`}
+                      style={{ height: 80 }}
+                    >
+                      {instructions.trim() || "Click to write your system prompt, or pick an industry template…"}
+                    </div>
                     <div className="flex justify-between mt-1">
-                      <a href="/docs" className="text-[10px] text-primary hover:underline">Learn how to write effective system prompts →</a>
+                      <button type="button" onClick={() => setInstructionsExpanded(true)} className="text-[10px] text-primary hover:underline">
+                        Click to expand and see the full prompt →
+                      </button>
                       <span className="text-[10px] text-foreground-muted">{instructions.length} chars</span>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">AI Model</label>
-                    <Select
-                      value={selectedProvider}
-                      onValueChange={(val) => {
-                        setSelectedProvider(val);
-                        const first = models.find((m) => m.provider === val);
-                        if (first) setSelectedModel(first.id);
-                      }}
-                    >
-                      <SelectTrigger className="w-full bg-secondary border-border mb-2">
-                        <SelectValue placeholder="Select provider" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {providers.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            <span className="mr-1.5">{p.emoji}</span>
-                            <span className="font-medium">{p.label}</span>
-                            <span className="ml-2 text-foreground-muted text-xs">— {p.desc}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={selectedModel} onValueChange={setSelectedModel}>
-                      <SelectTrigger className="w-full bg-secondary border-border">
-                        <SelectValue placeholder="Select model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {models.filter((m) => m.provider === selectedProvider).map((m) => (
-                          <SelectItem key={m.id} value={m.id}>
-                            <span className="font-medium">{m.name}</span>
-                            <span className="ml-2 text-foreground-muted text-xs">— {m.desc}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {selectedModel === "__custom_openrouter__" && (
-                      <div className="mt-2">
-                        <input
-                          value={customModel}
-                          onChange={(e) => setCustomModel(e.target.value)}
-                          placeholder="e.g. meta-llama/llama-3.1-8b-instruct"
-                          className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                        />
-                        <p className="text-[10px] text-foreground-muted mt-1">
-                          Paste any slug from <a href="https://openrouter.ai/models" target="_blank" rel="noopener" className="text-primary hover:underline">openrouter.ai/models</a>
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Personality</label>
-                    <Select value={personality} onValueChange={setPersonality}>
-                      <SelectTrigger className="w-full bg-secondary border-border">
-                        <SelectValue placeholder="Select personality" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-52">
-                        {personalities.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>
-                            <span className="font-medium">{p.name}</span>
-                            <span className="ml-2 text-foreground-muted text-xs">— {p.desc}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">AI Model</label>
+                      {(() => {
+                        const sel = models.find((m) => m.id === selectedModel);
+                        const meta = providers.find((p) => p.id === sel?.provider);
+                        const isEmpty = !selectedModel;
+                        const label = isEmpty
+                          ? "Select model"
+                          : selectedModel === "__custom_openrouter__"
+                            ? (customModel.trim() || "Custom OpenRouter model")
+                            : (sel?.name ?? selectedModel);
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => setModelPickerOpen(true)}
+                            className="w-full flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm hover:border-primary/50 transition-all"
+                          >
+                            {!isEmpty && <span className="text-base leading-none">{meta?.emoji ?? "🤖"}</span>}
+                            <span className={`font-medium truncate flex-1 text-left ${isEmpty ? "text-foreground-muted" : "text-foreground"}`}>{label}</span>
+                            <ChevronDown size={14} className="text-foreground-muted shrink-0" />
+                          </button>
+                        );
+                      })()}
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Personality</label>
+                      {(() => {
+                        const sel = personalities.find((p) => p.id === personality);
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => setPersonalityOpen(true)}
+                            className="w-full flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm hover:border-primary/50 transition-all"
+                          >
+                            <span className="font-medium truncate flex-1 text-left text-foreground">{sel?.name ?? "Select personality"}</span>
+                            <ChevronDown size={14} className="text-foreground-muted shrink-0" />
+                          </button>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </>
               )}
