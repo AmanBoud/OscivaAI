@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AgentProvider } from "@/context/AgentContext";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { NotificationProvider } from "@/hooks/useNotifications";
 import AppLayout from "@/components/layout/AppLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { ensureDataVersion } from "@/lib/userStore";
@@ -43,6 +44,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
+          <NotificationProvider>
           <AgentProvider>
             <Sonner />
             <BrowserRouter>
@@ -75,6 +77,7 @@ const App = () => {
               </Routes>
             </BrowserRouter>
           </AgentProvider>
+          </NotificationProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>

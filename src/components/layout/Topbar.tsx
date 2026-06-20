@@ -11,13 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth, getInitials } from "@/hooks/useAuth";
 import { useAgents } from "@/context/AgentContext";
+import { useNotifications } from "@/hooks/useNotifications";
 
 interface TopbarProps {
   title: string;
   subtitle?: string;
 }
-
-type Notif = { id: string; title: string; time: string; read: boolean };
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -40,24 +39,14 @@ const pages = [
 
 export default function Topbar({ title, subtitle }: TopbarProps) {
   const navigate = useNavigate();
-  const [notifs, setNotifs] = useState<Notif[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { user, profile, signOut: doSignOut } = useAuth();
   const { agents } = useAgents();
+  const { notifications: notifs, unread, markRead, markAllRead } = useNotifications();
   const popRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const unread = notifs.filter((n) => !n.read).length;
-
-  useEffect(() => {
-    if (user?.created_at) {
-      setNotifs([
-        { id: "welcome", title: "Welcome to Osciva AI! 🎉", time: timeAgo(user.created_at), read: false },
-      ]);
-    }
-  }, [user?.id]);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -85,11 +74,6 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
   const filteredPages = pages.filter((p) => p.label.toLowerCase().includes(q));
 
   const goTo = (path: string) => { setSearchOpen(false); navigate(path); };
-
-  const markRead = (id: string) =>
-    setNotifs((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-
-  const markAllRead = () => setNotifs((prev) => prev.map((n) => ({ ...n, read: true })));
 
   const signOut = async () => {
     await doSignOut();
@@ -156,7 +140,8 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
                       <span className={`mt-1 w-2 h-2 rounded-full shrink-0 ${!n.read ? "bg-primary" : "bg-transparent"}`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground leading-snug">{n.title}</p>
-                        <p className="text-[10px] text-foreground-muted mt-0.5">{n.time}</p>
+                        {n.body && <p className="text-[11px] text-foreground-secondary mt-0.5 leading-snug line-clamp-2">{n.body}</p>}
+                        <p className="text-[10px] text-foreground-muted mt-0.5">{timeAgo(n.created_at)}</p>
                       </div>
                     </button>
                   ))

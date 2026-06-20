@@ -293,6 +293,15 @@ async function ensureConversation(agentId: string, ownerId: string, conversation
   }
 }
 
+// Notify the agent owner (best-effort; never breaks chat).
+async function notifyOwner(userId: string, agentId: string, type: string, title: string, body: string) {
+  try {
+    await admin.from("notifications").insert({ user_id: userId, agent_id: agentId, type, title, body: body.slice(0, 160) });
+  } catch {
+    // notifications must never break the chat
+  }
+}
+
 async function logTurn(conversationId: string | null, agentId: string, userText: string, assistantText: string) {
   if (!conversationId) return;
   try {
@@ -473,6 +482,16 @@ Deno.serve(async (req) => {
       // Owner Live-Test chats (test:true) are answered but never logged, so they
       // don't inflate the owner's own analytics.
       const conversationId = test ? null : await ensureConversation(agentId, agent.user_id, convIdIn ?? null);
+      // A fresh visitor conversation (no incoming id) → notify the owner once.
+      if (!test && !convIdIn && conversationId) {
+        notifyOwner(
+          agent.user_id,
+          agentId,
+          "chat",
+          `New chat on ${agent.name ?? "your agent"}`,
+          userText || "A visitor started a conversation.",
+        ).then(() => {}, () => {});
+      }
       const countTurn = () => {
         if (!test) admin.rpc("increment_agent_message", { p_agent_id: agentId }).then(() => {}, () => {});
       };

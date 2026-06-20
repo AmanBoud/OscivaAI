@@ -208,6 +208,18 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     // Store the access password (if any) in the owner-only table.
     await writeAgentPassword(agentId, agent.password, agent.passwordEnabled);
 
+    // Notify the owner (shows live in the dashboard bell). Best-effort.
+    supabase
+      .from("notifications")
+      .insert({
+        user_id: user.id,
+        agent_id: agentId,
+        type: "agent",
+        title: `Agent created: ${agent.name}`,
+        body: `Your agent "${agent.name}" is live and ready to embed.`,
+      })
+      .then(() => {}, () => {});
+
     // Map old client source IDs -> new DB IDs
     const idMap: Record<string, string> = {};
     if (agent.sources.length) {
