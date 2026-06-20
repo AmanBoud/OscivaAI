@@ -42,7 +42,6 @@ export default function ContactPage() {
 
       <PageHero
         breadcrumb="Contact"
-        badge="We usually reply within a day"
         title="Let's talk about your"
         highlight="AI assistant"
         subtitle="Questions about the product, pricing, security or a custom rollout? Send a note and a real person will get back to you."

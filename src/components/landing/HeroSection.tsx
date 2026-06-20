@@ -26,14 +26,6 @@ export default function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-10 items-center">
           {/* Copy */}
           <div className="text-center lg:text-left">
-            <motion.div {...up(0)} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#EBEDF0] bg-white/70 backdrop-blur shadow-sm mb-6">
-              <span className="flex h-2 w-2">
-                <span className="absolute h-2 w-2 rounded-full bg-[#E8613C]/40 animate-ping" />
-                <span className="h-2 w-2 rounded-full bg-[#E8613C]" />
-              </span>
-              <span className="text-[12.5px] font-medium text-[#586072]">No-code AI assistant builder · Made in India</span>
-            </motion.div>
-
             <motion.h1
               {...up(0.08)}
               className="display text-[40px] sm:text-[52px] md:text-[60px] font-extrabold text-[#0B0E14]"

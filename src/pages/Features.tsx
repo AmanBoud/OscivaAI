@@ -48,7 +48,6 @@ export default function FeaturesPage() {
 
       <PageHero
         breadcrumb="Features"
-        badge="The complete platform"
         title="Everything you need to ship a"
         highlight="production AI agent"
         subtitle="From private knowledge bases to live analytics and one-line embedding — Osciva covers the whole journey, without a single line of glue code."

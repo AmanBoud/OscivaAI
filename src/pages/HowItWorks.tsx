@@ -30,7 +30,6 @@ export default function HowItWorksPage() {
 
       <PageHero
         breadcrumb="How it works"
-        badge="From zero to live"
         title="Launch a real AI agent in"
         highlight="three steps"
         subtitle="No engineering team, no integrations to maintain. Configure, train on your data, and embed — that's the whole process."

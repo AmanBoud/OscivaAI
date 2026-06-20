@@ -16,7 +16,6 @@ const up = (d: number) => ({
  */
 export default function PageHero({
   breadcrumb,
-  badge,
   title,
   highlight,
   subtitle,
@@ -25,7 +24,6 @@ export default function PageHero({
   children,
 }: {
   breadcrumb: string;
-  badge?: string;
   title: string;
   highlight?: string;
   subtitle: string;
@@ -49,12 +47,6 @@ export default function PageHero({
           <span className="text-[#586072] font-medium">{breadcrumb}</span>
         </motion.nav>
 
-        {badge && (
-          <motion.div {...up(0.05)} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#EBEDF0] bg-white/70 backdrop-blur shadow-sm mb-6">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#E8613C]" />
-            <span className="text-[12.5px] font-medium text-[#586072]">{badge}</span>
-          </motion.div>
-        )}
 
         <motion.h1 {...up(0.1)} className="display text-[36px] sm:text-[46px] md:text-[56px] font-extrabold text-[#0B0E14]">
           {title}

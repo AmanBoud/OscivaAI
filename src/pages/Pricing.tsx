@@ -61,7 +61,6 @@ export default function PricingPage() {
 
       <PageHero
         breadcrumb="Pricing"
-        badge="Transparent INR pricing"
         title="Pricing that scales"
         highlight="with you"
         subtitle="Start free, upgrade when you grow. Every plan includes GST invoices and India-hosted data — no hidden fees, ever."
