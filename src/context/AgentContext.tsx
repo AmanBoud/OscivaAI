@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { notify } from "@/lib/notify";
 
 export interface AgentSource {
   id: string;
@@ -209,16 +210,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     await writeAgentPassword(agentId, agent.password, agent.passwordEnabled);
 
     // Notify the owner (shows live in the dashboard bell). Best-effort.
-    supabase
-      .from("notifications")
-      .insert({
-        user_id: user.id,
-        agent_id: agentId,
-        type: "agent",
-        title: `Agent created: ${agent.name}`,
-        body: `Your agent "${agent.name}" is live and ready to embed.`,
-      })
-      .then(() => {}, () => {});
+    void notify("agent", `Agent created: ${agent.name}`, `Your agent "${agent.name}" is live and ready to embed.`, agentId);
 
     // Map old client source IDs -> new DB IDs
     const idMap: Record<string, string> = {};
@@ -260,6 +252,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
 
   const updateAgent = async (id: string, data: Partial<Agent>) => {
     if (!user) return;
+    const agentName = data.name ?? agents.find((a) => a.id === id)?.name ?? "your agent";
     const patch: any = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.instructions !== undefined) patch.instructions = data.instructions;
@@ -344,12 +337,22 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       supabase.functions.invoke("ingest", { body: { agentId: id } }).catch(() => {});
     }
 
+    const knowledgeChanged = data.sources !== undefined || data.chunks !== undefined;
+    void notify(
+      "agent",
+      `Agent updated: ${agentName}`,
+      knowledgeChanged ? `Knowledge base for "${agentName}" was re-indexed.` : `Your changes to "${agentName}" were saved.`,
+      id,
+    );
+
     await loadAgents();
   };
 
   const deleteAgent = async (id: string) => {
+    const name = agents.find((a) => a.id === id)?.name ?? "Agent";
     await supabase.from("agents").delete().eq("id", id);
     setAgents((prev) => prev.filter((a) => a.id !== id));
+    void notify("agent", `Agent deleted: ${name}`);
   };
 
   const updateAgentStats = async (id: string, msgs: number, convs: number) => {

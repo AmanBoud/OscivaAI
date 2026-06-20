@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Shield, Eye, EyeOff, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadKeys, setKey, loadKeysFromServer, syncKeyToServer, ApiKeyMap, Provider } from "@/lib/apiKeyStore";
+import { notify } from "@/lib/notify";
 
 const providers: { name: Provider; docs: string; description?: string }[] = [
   { name: "OpenAI", docs: "https://platform.openai.com/api-keys" },
@@ -39,6 +40,7 @@ export default function ApiKeys() {
     try {
       await syncKeyToServer(name, value);
       toast.success(`${name} API key saved`);
+      void notify("info", `${name} API key connected`, "Agents using this provider can now answer chats.");
     } catch {
       toast.error("Saved locally, but failed to sync to server. Check your connection.");
     }
