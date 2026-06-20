@@ -31,7 +31,7 @@ const C = {
   mute: "#8C94A1",
   line: "#EBEDF0",
   soft: "#F7F8FA",
-  brand: "#E8613C",
+  brand: "#0EC2A8",
 } as const;
 
 /* ----------------------------------------------------------------------------
@@ -59,21 +59,21 @@ function UL({ children }: { children: React.ReactNode }) {
 function LI({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex gap-2.5 text-[14.5px] leading-[1.7] text-[#3a4150]">
-      <span className="mt-[9px] h-1.5 w-1.5 rounded-full bg-[#E8613C] shrink-0" />
+      <span className="mt-[9px] h-1.5 w-1.5 rounded-full bg-[#0EC2A8] shrink-0" />
       <span className="min-w-0">{children}</span>
     </li>
   );
 }
 function Code({ children }: { children: React.ReactNode }) {
   return (
-    <code className="px-1.5 py-0.5 rounded-[5px] bg-[#F2F4F7] border border-[#EBEDF0] text-[12.5px] font-mono text-[#CF4F2C] break-words">
+    <code className="px-1.5 py-0.5 rounded-[5px] bg-[#F2F4F7] border border-[#EBEDF0] text-[12.5px] font-mono text-[#0AA593] break-words">
       {children}
     </code>
   );
 }
 function A({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#E8613C] font-medium hover:underline">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#0EC2A8] font-medium hover:underline">
       {children}
     </a>
   );
@@ -1222,7 +1222,7 @@ data: [DONE]`}
       </P>
 
       <Note type="info">
-        Still stuck? Reach out from the <a href="/contact" className="text-[#E8613C] font-medium hover:underline">Contact</a>{" "}
+        Still stuck? Reach out from the <a href="/contact" className="text-[#0EC2A8] font-medium hover:underline">Contact</a>{" "}
         page and we'll help.
       </Note>
     </>
@@ -1290,7 +1290,7 @@ export default function Docs() {
                 onClick={() => go(it.id)}
                 className={`w-full text-left px-3 py-1.5 rounded-lg text-[13.5px] transition-colors ${
                   active === it.id
-                    ? "bg-[#FFF1EC] text-[#CF4F2C] font-semibold"
+                    ? "bg-[#FFF1EC] text-[#0AA593] font-semibold"
                     : "text-[#586072] hover:text-[#0B0E14] hover:bg-[#F2F4F7]"
                 }`}
               >
@@ -1321,7 +1321,7 @@ export default function Docs() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search docs…"
-                  className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#F7F8FA] border border-[#EBEDF0] text-[13px] text-[#0B0E14] placeholder:text-[#8C94A1] focus:outline-none focus:ring-2 focus:ring-[#E8613C]/30"
+                  className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#F7F8FA] border border-[#EBEDF0] text-[13px] text-[#0B0E14] placeholder:text-[#8C94A1] focus:outline-none focus:ring-2 focus:ring-[#0EC2A8]/30"
                 />
               </div>
               {SidebarNav}
@@ -1347,7 +1347,7 @@ export default function Docs() {
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search docs…"
-                      className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#F7F8FA] border border-[#EBEDF0] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#E8613C]/30"
+                      className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#F7F8FA] border border-[#EBEDF0] text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0EC2A8]/30"
                     />
                   </div>
                   {SidebarNav}
@@ -1365,12 +1365,12 @@ export default function Docs() {
                 {prev ? (
                   <button
                     onClick={() => go(prev.id)}
-                    className="group text-left rounded-xl border border-[#EBEDF0] p-4 hover:border-[#E8613C]/40 hover:bg-[#FFF8F5] transition-colors"
+                    className="group text-left rounded-xl border border-[#EBEDF0] p-4 hover:border-[#0EC2A8]/40 hover:bg-[#FFF8F5] transition-colors"
                   >
                     <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#8C94A1]">
                       <ArrowLeft size={12} /> Previous
                     </span>
-                    <span className="mt-1 block text-[14px] font-bold text-[#0B0E14] group-hover:text-[#CF4F2C]">{prev.label}</span>
+                    <span className="mt-1 block text-[14px] font-bold text-[#0B0E14] group-hover:text-[#0AA593]">{prev.label}</span>
                   </button>
                 ) : (
                   <span />
@@ -1378,12 +1378,12 @@ export default function Docs() {
                 {next ? (
                   <button
                     onClick={() => go(next.id)}
-                    className="group text-right rounded-xl border border-[#EBEDF0] p-4 hover:border-[#E8613C]/40 hover:bg-[#FFF8F5] transition-colors"
+                    className="group text-right rounded-xl border border-[#EBEDF0] p-4 hover:border-[#0EC2A8]/40 hover:bg-[#FFF8F5] transition-colors"
                   >
                     <span className="flex items-center justify-end gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#8C94A1]">
                       Next <ArrowRight size={12} />
                     </span>
-                    <span className="mt-1 block text-[14px] font-bold text-[#0B0E14] group-hover:text-[#CF4F2C]">{next.label}</span>
+                    <span className="mt-1 block text-[14px] font-bold text-[#0B0E14] group-hover:text-[#0AA593]">{next.label}</span>
                   </button>
                 ) : (
                   <span />

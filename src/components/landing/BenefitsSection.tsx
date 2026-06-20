@@ -24,7 +24,7 @@ export default function BenefitsSection() {
             <Reveal key={b.title} i={(i % 3)}>
               <div className="group h-full bg-white p-7 transition-colors hover:bg-[#FBFBFC]">
                 <div className="w-11 h-11 rounded-xl bg-[#FFF1EC] flex items-center justify-center mb-4">
-                  <b.icon size={20} className="text-[#E8613C]" />
+                  <b.icon size={20} className="text-[#0EC2A8]" />
                 </div>
                 <h3 className="text-[15.5px] font-bold text-[#0B0E14] mb-2">{b.title}</h3>
                 <p className="text-[13.5px] text-[#586072] leading-relaxed">{b.desc}</p>

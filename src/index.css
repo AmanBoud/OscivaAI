@@ -27,9 +27,9 @@
     --popover-foreground: 222 47% 8%;
 
     /* Refined Osciva orange */
-    --primary: 14 80% 57%;
+    --primary: 171 87% 41%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 14 80% 57%;
+    --primary-glow: 171 87% 41%;
 
     --secondary: 220 16% 96%;
     --secondary-foreground: 222 47% 8%;
@@ -37,7 +37,7 @@
     --muted: 220 16% 95%;
     --muted-foreground: 220 9% 55%;
 
-    --accent: 14 80% 57%;
+    --accent: 171 87% 41%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
@@ -55,7 +55,7 @@
     /* Cool hairline borders (no more warm cream) */
     --border: 220 16% 92%;
     --input: 220 16% 92%;
-    --ring: 14 80% 57%;
+    --ring: 171 87% 41%;
 
     --radius: 0.875rem;
 
@@ -64,17 +64,17 @@
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 12% 38%;
-    --sidebar-primary: 14 80% 57%;
+    --sidebar-primary: 171 87% 41%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 220 20% 97%;
     --sidebar-accent-foreground: 222 47% 8%;
     --sidebar-border: 220 16% 92%;
-    --sidebar-ring: 14 80% 57%;
+    --sidebar-ring: 171 87% 41%;
 
     /* Brand constants reused across the premium UI */
     --ink: 222 47% 8%;          /* #0B0E14-ish near-black slate */
-    --brand: 14 80% 57%;        /* Osciva orange */
-    --brand-strong: 14 72% 48%; /* hover */
+    --brand: 171 87% 41%;        /* Osciva orange */
+    --brand-strong: 171 87% 34%; /* hover */
   }
 }
 
@@ -151,7 +151,7 @@
   }
   .text-gradient-brand {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(120deg, hsl(14 80% 57%), hsl(18 85% 62%));
+    background-image: linear-gradient(120deg, hsl(171 87% 41%), hsl(178 80% 48%));
   }
 
   /* ---- Decorative backgrounds ---- */
@@ -169,7 +169,7 @@
   }
   .bg-mesh {
     background:
-      radial-gradient(50% 55% at 50% -5%, hsl(14 80% 57% / 0.06) 0%, transparent 60%);
+      radial-gradient(50% 55% at 50% -5%, hsl(171 87% 41% / 0.06) 0%, transparent 60%);
   }
   .mask-fade-x {
     -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);

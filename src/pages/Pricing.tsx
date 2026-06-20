@@ -84,7 +84,7 @@ export default function PricingPage() {
                   <tr className="border-b border-[#EBEDF0]">
                     <th className="text-left text-[13px] font-semibold text-[#586072] px-6 py-5 w-[28%]">Plan</th>
                     {planNames.map((n) => (
-                      <th key={n} className={`text-center text-[14px] font-bold px-4 py-5 ${n === "Growth" ? "text-[#E8613C]" : "text-[#0B0E14]"}`}>
+                      <th key={n} className={`text-center text-[14px] font-bold px-4 py-5 ${n === "Growth" ? "text-[#0EC2A8]" : "text-[#0B0E14]"}`}>
                         {n}
                       </th>
                     ))}
@@ -121,7 +121,7 @@ export default function PricingPage() {
               <Reveal key={g.title} i={i}>
                 <div className="h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 flex items-start gap-4">
                   <div className="w-11 h-11 rounded-xl bg-[#FFF1EC] flex items-center justify-center shrink-0">
-                    <g.icon size={19} className="text-[#E8613C]" />
+                    <g.icon size={19} className="text-[#0EC2A8]" />
                   </div>
                   <div>
                     <h3 className="text-[15px] font-bold text-[#0B0E14] mb-1.5">{g.title}</h3>

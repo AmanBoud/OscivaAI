@@ -35,9 +35,9 @@ export default function FeaturesSection() {
           <Reveal className="md:col-span-2 lg:row-span-2">
             <div className="relative h-full overflow-hidden rounded-3xl border border-[#EBEDF0] bg-[#0B0E14] p-8 text-white">
               <div className="absolute inset-0 bg-grid-dark opacity-60" aria-hidden />
-              <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#E8613C]/25 blur-[90px]" aria-hidden />
+              <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#0EC2A8]/25 blur-[90px]" aria-hidden />
               <div className="relative">
-                <div className="w-12 h-12 rounded-xl bg-[#E8613C] flex items-center justify-center mb-6 shadow-brand">
+                <div className="w-12 h-12 rounded-xl bg-[#0EC2A8] flex items-center justify-center mb-6 shadow-brand">
                   <spotlight.icon size={22} className="text-white" />
                 </div>
                 <h3 className="text-[22px] md:text-[26px] font-extrabold display mb-3">{spotlight.title}</h3>
@@ -65,9 +65,9 @@ export default function FeaturesSection() {
 
           {features.map((f, i) => (
             <Reveal key={f.title} i={(i % 3) + 1}>
-              <div className="group h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 transition-all duration-300 hover:border-[#E8613C]/30 hover:shadow-premium hover:-translate-y-1">
-                <div className="w-11 h-11 rounded-xl bg-[#F7F8FA] border border-[#EBEDF0] flex items-center justify-center mb-4 transition-colors group-hover:bg-[#FFF1EC] group-hover:border-[#E8613C]/20">
-                  <f.icon size={19} className="text-[#0B0E14] transition-colors group-hover:text-[#E8613C]" />
+              <div className="group h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 transition-all duration-300 hover:border-[#0EC2A8]/30 hover:shadow-premium hover:-translate-y-1">
+                <div className="w-11 h-11 rounded-xl bg-[#F7F8FA] border border-[#EBEDF0] flex items-center justify-center mb-4 transition-colors group-hover:bg-[#FFF1EC] group-hover:border-[#0EC2A8]/20">
+                  <f.icon size={19} className="text-[#0B0E14] transition-colors group-hover:text-[#0EC2A8]" />
                 </div>
                 <h3 className="text-[15px] font-bold text-[#0B0E14] mb-1.5">{f.title}</h3>
                 <p className="text-[13px] text-[#586072] leading-relaxed">{f.desc}</p>

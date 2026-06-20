@@ -26,14 +26,14 @@ export default function FAQSection() {
             return (
               <Reveal key={i} i={i}>
                 <div
-                  className={`rounded-2xl border bg-white transition-all ${isOpen ? "border-[#E8613C]/30 shadow-sm" : "border-[#EBEDF0]"}`}
+                  className={`rounded-2xl border bg-white transition-all ${isOpen ? "border-[#0EC2A8]/30 shadow-sm" : "border-[#EBEDF0]"}`}
                 >
                   <button
                     onClick={() => setOpen(isOpen ? null : i)}
                     className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
                   >
                     <span className="text-[15px] font-semibold text-[#0B0E14]">{faq.q}</span>
-                    <span className={`shrink-0 grid place-items-center w-7 h-7 rounded-full border transition-all ${isOpen ? "bg-[#E8613C] border-[#E8613C] text-white rotate-45" : "border-[#E3E6EB] text-[#586072]"}`}>
+                    <span className={`shrink-0 grid place-items-center w-7 h-7 rounded-full border transition-all ${isOpen ? "bg-[#0EC2A8] border-[#0EC2A8] text-white rotate-45" : "border-[#E3E6EB] text-[#586072]"}`}>
                       <Plus size={15} />
                     </span>
                   </button>

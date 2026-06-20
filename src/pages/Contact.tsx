@@ -58,7 +58,7 @@ export default function ContactPage() {
                 {methods.map((m) => (
                   <div key={m.label} className="rounded-2xl border border-[#EBEDF0] bg-white p-5 hover:shadow-premium hover:-translate-y-0.5 transition-all duration-300">
                     <div className="w-11 h-11 rounded-xl bg-[#F7F8FA] border border-[#EBEDF0] flex items-center justify-center mb-4">
-                      <m.icon size={19} className="text-[#E8613C]" />
+                      <m.icon size={19} className="text-[#0EC2A8]" />
                     </div>
                     <p className="text-[11px] font-semibold text-[#8C94A1] uppercase tracking-wider mb-1">{m.label}</p>
                     <p className="text-[14.5px] text-[#0B0E14] font-semibold">{m.value}</p>
@@ -71,7 +71,7 @@ export default function ContactPage() {
             <Reveal i={1}>
               <div className="mt-6 rounded-2xl border border-[#EBEDF0] bg-[#0B0E14] p-6 text-white">
                 <div className="flex items-center gap-2 mb-4">
-                  <Clock size={16} className="text-[#E8613C]" />
+                  <Clock size={16} className="text-[#0EC2A8]" />
                   <span className="text-[13px] font-semibold">What you can expect</span>
                 </div>
                 <ul className="space-y-3">
@@ -117,7 +117,7 @@ export default function ContactPage() {
                         placeholder={field.placeholder}
                         value={form[field.id as keyof typeof form]}
                         onChange={(e) => setForm({ ...form, [field.id]: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-[#E3E6EB] bg-[#FBFBFC] text-[14px] text-[#0B0E14] placeholder:text-[#A2AAB6] focus:outline-none focus:bg-white focus:border-[#E8613C]/50 focus:ring-4 focus:ring-[#E8613C]/10 transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-[#E3E6EB] bg-[#FBFBFC] text-[14px] text-[#0B0E14] placeholder:text-[#A2AAB6] focus:outline-none focus:bg-white focus:border-[#0EC2A8]/50 focus:ring-4 focus:ring-[#0EC2A8]/10 transition-all"
                       />
                     </div>
                   ))}
@@ -128,12 +128,12 @@ export default function ContactPage() {
                       placeholder="Tell us a bit about what you're building…"
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E3E6EB] bg-[#FBFBFC] text-[14px] text-[#0B0E14] placeholder:text-[#A2AAB6] focus:outline-none focus:bg-white focus:border-[#E8613C]/50 focus:ring-4 focus:ring-[#E8613C]/10 transition-all resize-none"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E3E6EB] bg-[#FBFBFC] text-[14px] text-[#0B0E14] placeholder:text-[#A2AAB6] focus:outline-none focus:bg-white focus:border-[#0EC2A8]/50 focus:ring-4 focus:ring-[#0EC2A8]/10 transition-all resize-none"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="group w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-[#E8613C] text-white text-[15px] font-semibold hover:bg-[#CF4F2C] transition-colors shadow-brand"
+                    className="group w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-[#0EC2A8] text-white text-[15px] font-semibold hover:bg-[#0AA593] transition-colors shadow-brand"
                   >
                     Send message
                     <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />

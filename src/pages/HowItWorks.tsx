@@ -51,9 +51,9 @@ export default function HowItWorksPage() {
           <div className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {useCases.map((u, i) => (
               <Reveal key={u.title} i={i % 3}>
-                <div className="group h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 transition-all duration-300 hover:border-[#E8613C]/30 hover:shadow-premium hover:-translate-y-1">
-                  <div className="w-11 h-11 rounded-xl bg-[#F7F8FA] border border-[#EBEDF0] flex items-center justify-center mb-4 transition-colors group-hover:bg-[#FFF1EC] group-hover:border-[#E8613C]/20">
-                    <u.icon size={19} className="text-[#0B0E14] transition-colors group-hover:text-[#E8613C]" />
+                <div className="group h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 transition-all duration-300 hover:border-[#0EC2A8]/30 hover:shadow-premium hover:-translate-y-1">
+                  <div className="w-11 h-11 rounded-xl bg-[#F7F8FA] border border-[#EBEDF0] flex items-center justify-center mb-4 transition-colors group-hover:bg-[#FFF1EC] group-hover:border-[#0EC2A8]/20">
+                    <u.icon size={19} className="text-[#0B0E14] transition-colors group-hover:text-[#0EC2A8]" />
                   </div>
                   <h3 className="text-[15.5px] font-bold text-[#0B0E14] mb-1.5">{u.title}</h3>
                   <p className="text-[13px] text-[#586072] leading-relaxed mb-4">{u.desc}</p>
@@ -84,7 +84,7 @@ export default function HowItWorksPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-3xl border border-[#E8613C]/30 bg-[#0B0E14] p-7 shadow-premium">
+              <div className="rounded-3xl border border-[#0EC2A8]/30 bg-[#0B0E14] p-7 shadow-premium">
                 <h3 className="text-[15px] font-bold text-white mb-5">With Osciva</h3>
                 <ul className="space-y-4">
                   {compare.map((c) => (

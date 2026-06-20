@@ -28,7 +28,7 @@ export default function TestimonialsSection() {
         <Reveal>
           <div className="relative overflow-hidden rounded-3xl bg-[#0B0E14] p-8 md:p-12 mb-20">
             <div className="absolute inset-0 bg-grid-dark opacity-50" aria-hidden />
-            <div className="absolute -top-20 left-1/4 w-72 h-72 rounded-full bg-[#E8613C]/20 blur-[100px]" aria-hidden />
+            <div className="absolute -top-20 left-1/4 w-72 h-72 rounded-full bg-[#0EC2A8]/20 blur-[100px]" aria-hidden />
             <div className="relative grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((s, i) => (
                 <motion.div
@@ -55,7 +55,7 @@ export default function TestimonialsSection() {
               <figure className="h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 transition-all duration-300 hover:shadow-premium hover:-translate-y-1">
                 <div className="flex gap-0.5 mb-4">
                   {[...Array(5)].map((_, j) => (
-                    <Star key={j} size={14} className="text-[#E8613C] fill-[#E8613C]" />
+                    <Star key={j} size={14} className="text-[#0EC2A8] fill-[#0EC2A8]" />
                   ))}
                 </div>
                 <blockquote className="text-[14px] text-[#1F2733] leading-relaxed mb-6">“{t.text}”</blockquote>

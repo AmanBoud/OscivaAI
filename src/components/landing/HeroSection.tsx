@@ -9,7 +9,11 @@ const up = (d: number) => ({
   transition: { duration: 0.7, delay: d, ease: EASE },
 });
 
-const industries = ["E-commerce", "Healthcare", "Education", "SaaS", "Real estate", "Fintech"];
+const stats = [
+  { stat: "4", unit: "providers", desc: "OpenAI, Anthropic, Google and OpenRouter. Your key, your model." },
+  { stat: "~30", unit: "minutes", desc: "From uploading your docs to a live agent on your website." },
+  { stat: "0%", unit: "token markup", desc: "Bring your own key and pay your AI provider directly." },
+];
 
 /* The real product surface — the Osciva chat widget — rendered as a live
  * component preview (not a fake dashboard screenshot). */
@@ -18,7 +22,7 @@ function ChatPreview() {
     <div className="w-full max-w-[420px] mx-auto rounded-[20px] bg-white border border-[#EBEDF0] shadow-float overflow-hidden">
       {/* widget header */}
       <div className="flex items-center gap-3 px-4 py-3 bg-[#0B0E14]">
-        <div className="w-9 h-9 rounded-full bg-[#E8613C] grid place-items-center text-white font-bold text-[13px]">O</div>
+        <div className="w-9 h-9 rounded-full bg-[#0EC2A8] grid place-items-center text-white font-bold text-[13px]">O</div>
         <div className="min-w-0 flex-1">
           <div className="text-[13px] font-semibold text-white leading-tight">Osciva Assistant</div>
           <div className="flex items-center gap-1.5 text-[11px] text-white/55">
@@ -40,7 +44,7 @@ function ChatPreview() {
           The Free plan gives you 50 message credits, one AI agent, and training on
           your documents and website. You can upgrade anytime.
           <span className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-[#586072]">
-            <FileText size={12} className="text-[#E8613C]" /> From: pricing-and-plans.pdf
+            <FileText size={12} className="text-[#0EC2A8]" /> From: pricing-and-plans.pdf
           </span>
         </div>
       </div>
@@ -50,7 +54,7 @@ function ChatPreview() {
         <div className="flex-1 rounded-full bg-[#F2F4F7] px-4 py-2 text-[12.5px] text-[#8C94A1]">
           Message Osciva…
         </div>
-        <div className="w-9 h-9 rounded-full bg-[#E8613C] grid place-items-center text-white">
+        <div className="w-9 h-9 rounded-full bg-[#0EC2A8] grid place-items-center text-white">
           <Send size={15} />
         </div>
       </div>
@@ -74,7 +78,7 @@ export default function HeroSection() {
               {...up(0)}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#EBEDF0] bg-[#F7F8FA] mb-7"
             >
-              <Sparkles size={13} className="text-[#E8613C]" />
+              <Sparkles size={13} className="text-[#0EC2A8]" />
               <span className="text-[12.5px] font-medium text-[#586072]">No-code AI agent builder, made in India</span>
             </motion.div>
 
@@ -82,7 +86,7 @@ export default function HeroSection() {
               {...up(0.08)}
               className="display text-[40px] sm:text-[52px] md:text-[60px] font-bold text-[#0B0E14]"
             >
-              AI agents that <span className="text-[#E8613C]">actually know</span> your business.
+              AI agents that <span className="text-[#0EC2A8]">actually know</span> your business.
             </motion.h1>
 
             <motion.p
@@ -96,9 +100,9 @@ export default function HeroSection() {
             <motion.div {...up(0.24)} className="mt-8 flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
               <button
                 onClick={() => navigate("/auth")}
-                className="group w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#E8613C] text-white text-[15px] font-semibold hover:bg-[#CF4F2C] transition-colors shadow-brand"
+                className="group w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#0EC2A8] text-white text-[15px] font-semibold hover:bg-[#0AA593] transition-colors shadow-brand"
               >
-                Start building free
+                Start Free Trial
                 <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
               </button>
               <button
@@ -107,6 +111,14 @@ export default function HeroSection() {
               >
                 See how it works
               </button>
+            </motion.div>
+
+            <motion.div {...up(0.32)} className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 justify-center lg:justify-start text-[13px] text-[#586072]">
+              {["No credit card", "50 free credits", "3-day trial", "Live in 30 minutes"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1.5">
+                  <Check size={14} className="text-[#0EC2A8]" /> {t}
+                </span>
+              ))}
             </motion.div>
           </div>
 
@@ -137,23 +149,20 @@ export default function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Honest reassurance + who it's for (moved out of the hero stack) */}
-        <motion.div {...up(0.42)} className="mt-20 md:mt-28">
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13.5px] text-[#586072]">
-            {["Free 50 credits", "No credit card", "Cancel anytime"].map((t) => (
-              <span key={t} className="inline-flex items-center gap-1.5">
-                <Check size={15} className="text-[#16A34A]" /> {t}
-              </span>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
-            <span className="text-[12.5px] text-[#A2AAB6] mr-1">Built for customer-facing teams in</span>
-            {industries.map((n) => (
-              <span key={n} className="text-[13px] font-semibold text-[#0B0E14]/70">
-                {n}
-              </span>
-            ))}
-          </div>
+        {/* Capability stats (honest, not invented customer metrics) */}
+        <motion.div
+          {...up(0.5)}
+          className="mt-20 md:mt-28 grid grid-cols-1 sm:grid-cols-3 gap-px rounded-3xl overflow-hidden border border-[#EBEDF0] bg-[#EBEDF0]"
+        >
+          {stats.map((s) => (
+            <div key={s.unit} className="bg-white p-7 text-center sm:text-left">
+              <div className="flex items-baseline gap-1.5 justify-center sm:justify-start">
+                <span className="display text-[40px] font-bold text-[#0B0E14]">{s.stat}</span>
+                <span className="text-[15px] font-semibold text-[#0EC2A8]">{s.unit}</span>
+              </div>
+              <p className="mt-2 text-[13.5px] text-[#586072] leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
         </motion.div>
       </div>
     </section>
