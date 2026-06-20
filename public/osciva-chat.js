@@ -67,10 +67,17 @@
     position: cfg.position || "right",
     suggestions: cfg.suggestions || [],
     bubbleMessages: cfg.bubbleMessages || ["Need help? 💬", "We're here for you 👋", "Ask me anything 💡", "Let's chat! 🤖"],
+    passwordRequired: false,
   };
 
   var conversationId = null;
   var history = []; // {role, content}
+
+  // ---- Per-agent access password (kept only for this browser session) ----
+  function pwKey() { return "osciva_pw_" + AGENT_ID; }
+  function getPw() { try { return sessionStorage.getItem(pwKey()) || ""; } catch (e) { return ""; } }
+  function setPw(v) { try { if (v) sessionStorage.setItem(pwKey(), v); else sessionStorage.removeItem(pwKey()); } catch (e) {} }
+  function needsPassword() { return settings.passwordRequired && !getPw(); }
 
   // ---- Inter font (matches osciva.io). Loaded once into the host page head. ----
   if (!document.getElementById("osciva-font")) {
@@ -146,6 +153,16 @@
       ".send-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}" +
       ".chat-footer{text-align:center;padding:12px;font-size:12px;color:#94a3b8;background:#f8fafc;border-top:1px solid #e2e8f0;font-weight:600;flex-shrink:0}" +
       ".chat-footer a{color:" + c + ";text-decoration:none;font-weight:700}" +
+      ".pw-gate{position:absolute;top:52px;left:0;right:0;bottom:0;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px 28px;text-align:center;z-index:6}" +
+      ".pw-gate.show{display:flex}" +
+      ".pw-gate .pw-lock{width:52px;height:52px;border-radius:50%;background:" + c + "14;color:" + c + ";display:flex;align-items:center;justify-content:center;font-size:24px}" +
+      ".pw-gate h4{margin:0;font-size:15px;font-weight:700;color:#1e293b}" +
+      ".pw-gate p{margin:0;font-size:12px;color:#64748b;line-height:1.5;max-width:240px}" +
+      ".pw-gate input{width:100%;max-width:240px;padding:11px 14px;border-radius:10px;border:1px solid #e2e8f0;font-size:15px;text-align:center}" +
+      ".pw-gate input:focus{outline:none;border-color:" + c + "}" +
+      ".pw-gate button{width:100%;max-width:240px;padding:11px;border-radius:10px;border:none;background:" + c + ";color:#fff;font-size:14px;font-weight:600;cursor:pointer}" +
+      ".pw-gate button:disabled{opacity:.6;cursor:default}" +
+      ".pw-gate .pw-err{font-size:12px;color:#dc2626;font-weight:500;min-height:14px}" +
       ".chat-toggle{position:fixed;bottom:24px;" + side + ":24px;width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;z-index:2147483000;" +
       "display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.15);transition:all .3s ease;padding:0;background:#fff}" +
       ".chat-toggle img{width:100%;height:100%;object-fit:contain;padding:11px;border-radius:50%}" +
@@ -181,6 +198,14 @@
       '      <button class="send-btn" id="send" title="Send">➤</button>' +
       '    </div>' +
       '    <div class="chat-footer">Powered by <a href="https://osciva.io/" target="_blank" rel="noopener">Osciva⚡</a></div>' +
+      '    <div class="pw-gate" id="pwgate">' +
+      '      <div class="pw-lock">🔒</div>' +
+      '      <h4>Password required</h4>' +
+      '      <p>This assistant is protected. Enter the password to start chatting.</p>' +
+      '      <input id="pwinput" type="password" placeholder="Enter password" autocomplete="off" />' +
+      '      <div class="pw-err" id="pwerr"></div>' +
+      '      <button id="pwbtn">Unlock</button>' +
+      '    </div>' +
       '  </div>' +
       "</div>" +
       '<button class="chat-toggle" id="toggle"><img src="' + settings.bubbleLogo + '" alt="Chat" /></button>' +
@@ -197,7 +222,51 @@
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); onSend(); }
     });
 
+    root.getElementById("pwbtn").addEventListener("click", submitPassword);
+    root.getElementById("pwinput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); submitPassword(); }
+    });
+
     typeBubble();
+  }
+
+  // ---- Password gate ----
+  function showGate() {
+    root.getElementById("pwgate").classList.add("show");
+    var i = root.getElementById("pwinput");
+    if (i) { i.value = ""; setTimeout(function () { i.focus(); }, 60); }
+  }
+  function hideGate() { root.getElementById("pwgate").classList.remove("show"); }
+
+  function submitPassword() {
+    var inp = root.getElementById("pwinput");
+    var err = root.getElementById("pwerr");
+    var btn = root.getElementById("pwbtn");
+    var val = (inp.value || "").trim();
+    if (!val) { err.textContent = "Please enter the password."; return; }
+    btn.disabled = true;
+    err.textContent = "";
+    fetch(API, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ agentId: AGENT_ID, messages: [], verifyOnly: true, password: val }),
+    })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }, function () { return { ok: false, d: {} }; }); })
+      .then(function (res) {
+        btn.disabled = false;
+        if (res.ok && res.d && res.d.ok) {
+          setPw(val);
+          hideGate();
+          if (root.getElementById("messages").children.length === 0) startConversation();
+        } else {
+          err.textContent =
+            res.d && res.d.error === "too_many_attempts" && res.d.reply
+              ? res.d.reply
+              : "Incorrect password. Please try again.";
+          inp.focus();
+        }
+      })
+      .catch(function () { btn.disabled = false; err.textContent = "Couldn't verify right now. Try again."; });
   }
 
   function setOpen(open) {
@@ -207,7 +276,8 @@
       container.classList.add("open");
       hideBubble();
       if (toggle) toggle.style.display = "none"; // hide the bubble while panel is open
-      if (root.getElementById("messages").children.length === 0) startConversation();
+      if (needsPassword()) showGate();
+      else if (root.getElementById("messages").children.length === 0) startConversation();
     } else {
       container.classList.remove("open");
       if (toggle) toggle.style.display = "flex"; // restore the bubble when closed
@@ -301,7 +371,7 @@
     fetch(API, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ agentId: AGENT_ID, messages: history.slice(-12), stream: true, conversationId: conversationId }),
+      body: JSON.stringify({ agentId: AGENT_ID, messages: history.slice(-12), stream: true, conversationId: conversationId, password: getPw() }),
     })
       .then(function (r) {
         if (!r.ok || !r.body) return r.json().then(handleJson, fail);
@@ -313,6 +383,7 @@
 
     function handleJson(data) {
       finishOk();
+      if (data && data.error === "password_required") { setPw(""); showGate(); return; }
       if (data && data.conversationId) conversationId = data.conversationId;
       var reply = data && data.reply ? data.reply : null;
       if (reply) { addMessage(reply, true); history.push({ role: "assistant", content: reply }); }
@@ -405,6 +476,7 @@
         if (!manual.color && data.color) settings.color = data.color;
         if (!manual.position && data.position) settings.position = data.position;
         if (!manual.suggestions && data.suggestions) settings.suggestions = data.suggestions;
+        settings.passwordRequired = data.passwordRequired === true;
       }
     })
     .catch(function () { /* render with defaults / manual config */ })

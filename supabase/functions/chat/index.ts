@@ -33,6 +33,10 @@ type Msg = { role: string; content: string };
 // Max visitor messages per agent per hour (per IP) when rate limiting is on.
 const RATE_LIMIT_PER_HOUR = 20;
 
+// Max wrong-password attempts per agent per hour (per IP) before a temporary
+// lockout — throttles brute-force on password-protected agents.
+const MAX_PW_ATTEMPTS = 10;
+
 // Friendly model aliases -> real provider model ids
 const OPENAI_MODELS: Record<string, string> = { "gpt-4o": "gpt-4o", "gpt-4o-mini": "gpt-4o-mini" };
 const ANTHROPIC_MODELS: Record<string, string> = {
@@ -48,6 +52,39 @@ function detectProvider(modelId: string): Provider {
   if (modelId.startsWith("claude")) return "Anthropic";
   if (modelId.startsWith("gemini")) return "Google AI";
   return "OpenAI";
+}
+
+// --- Access control helpers (domain whitelist + password gate) ---
+async function sha256Hex(s: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function hostFrom(v: string | null): string {
+  if (!v) return "";
+  try {
+    return new URL(v).hostname.toLowerCase();
+  } catch {
+    return v.toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  }
+}
+
+// Normalise an owner-entered domain ("https://www.x.com/path" -> "x.com").
+function normDomain(d: string): string {
+  return d.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/^www\./, "");
+}
+
+// Is the request's browser origin allowed by the agent's domain whitelist?
+// An empty whitelist means "allow everywhere". A non-empty whitelist with no
+// usable Origin/Referer (e.g. a raw server-to-server call) is blocked.
+function domainAllowed(origin: string | null, referer: string | null, domains: string[]): boolean {
+  if (!domains.length) return true;
+  const host = (hostFrom(origin) || hostFrom(referer)).replace(/^www\./, "");
+  if (!host) return false;
+  return domains.some((d) => {
+    const nd = normDomain(d);
+    return !!nd && (host === nd || host.endsWith("." + nd));
+  });
 }
 
 async function embed(text: string): Promise<number[]> {
@@ -283,10 +320,22 @@ Deno.serve(async (req) => {
       if (!agentId) return json({ error: "agentId required" }, 400);
       const { data: agent } = await admin
         .from("agents")
-        .select("name, welcome_msg, color, position, chat_icon, logo_url, suggestions, active")
+        .select("name, welcome_msg, color, position, chat_icon, logo_url, suggestions, active, password_enabled")
         .eq("id", agentId)
         .maybeSingle();
       if (!agent || !agent.active) return json({ error: "Agent not found" }, 404);
+
+      // A password is only actually required if one has been set (hash exists).
+      let passwordRequired = false;
+      if (agent.password_enabled) {
+        const { data: access } = await admin
+          .from("agent_access")
+          .select("password_hash")
+          .eq("agent_id", agentId)
+          .maybeSingle();
+        passwordRequired = !!access?.password_hash;
+      }
+
       return json({
         name: agent.name,
         welcomeMsg: agent.welcome_msg,
@@ -295,16 +344,68 @@ Deno.serve(async (req) => {
         chatIcon: agent.chat_icon,
         logoUrl: agent.logo_url ?? "",
         suggestions: agent.suggestions ?? [],
+        passwordRequired,
       });
     }
 
     // --- Chat ---
     if (req.method === "POST") {
-      const { agentId, messages, stream, test, conversationId: convIdIn } = await req.json();
+      const { agentId, messages, stream, test, conversationId: convIdIn, password, verifyOnly } = await req.json();
       if (!agentId || !Array.isArray(messages)) return json({ error: "agentId and messages[] required" }, 400);
 
       const { data: agent } = await admin.from("agents").select("*").eq("id", agentId).maybeSingle();
       if (!agent || !agent.active) return json({ error: "Agent not found" }, 404);
+
+      // Access control — runs BEFORE rate limiting, RAG, and any LLM call, so
+      // blocked requests cost nothing. Skipped for the owner's own Live-Test.
+      if (!test) {
+        // 1) Domain whitelist — restrict which sites may embed this agent.
+        if (Array.isArray(agent.domains) && agent.domains.length) {
+          const ok = domainAllowed(req.headers.get("origin"), req.headers.get("referer"), agent.domains);
+          if (!ok) {
+            return json({ error: "domain_not_allowed", reply: "This assistant isn't available on this website." }, 403);
+          }
+        }
+
+        // 2) Password gate — only enforced if enabled AND a password is set.
+        if (agent.password_enabled) {
+          const { data: access } = await admin
+            .from("agent_access")
+            .select("password_hash")
+            .eq("agent_id", agentId)
+            .maybeSingle();
+          const hash = access?.password_hash ?? "";
+          if (hash) {
+            const supplied = typeof password === "string" && password ? await sha256Hex(password) : "";
+            if (supplied !== hash) {
+              // Throttle brute-force: count genuine wrong-password attempts per
+              // IP per agent and lock out after MAX_PW_ATTEMPTS for the window.
+              if (typeof password === "string" && password) {
+                const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+                const { data: fails } = await admin.rpc("bump_rate_limit", {
+                  p_agent_id: agentId,
+                  p_client_id: ip + "|pwfail",
+                  p_window_seconds: 3600,
+                });
+                if (typeof fails === "number" && fails > MAX_PW_ATTEMPTS) {
+                  return json(
+                    { error: "too_many_attempts", reply: "Too many incorrect attempts. Please try again later." },
+                    429,
+                  );
+                }
+              }
+              return json(
+                { error: "password_required", reply: "🔒 This assistant is password-protected. Please enter the password to continue." },
+                401,
+              );
+            }
+          }
+        }
+      }
+
+      // Lightweight gate check used by the widget to unlock before chatting.
+      // Reaches here only after domain + password passed, so it's always valid.
+      if (verifyOnly) return json({ ok: true });
 
       // Rate limiting — protects the owner's LLM spend from abuse/bots.
       // On by default (only an explicit `false` disables it). Skipped for the

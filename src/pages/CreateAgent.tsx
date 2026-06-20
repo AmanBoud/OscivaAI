@@ -90,6 +90,7 @@ export default function CreateAgent() {
   const [newSuggestion, setNewSuggestion] = useState("");
   const [position, setPosition] = useState<"left" | "right">(existingAgent?.position ?? "right");
   const [passwordEnabled, setPasswordEnabled] = useState(existingAgent?.passwordEnabled ?? false);
+  const [password, setPassword] = useState("");
   const [rateLimitEnabled, setRateLimitEnabled] = useState(existingAgent?.rateLimitEnabled ?? true);
   const [rateLimitPerHour, setRateLimitPerHour] = useState(existingAgent?.rateLimitPerHour ?? 20);
   const [domains, setDomains] = useState<string[]>(existingAgent?.domains ?? []);
@@ -288,6 +289,11 @@ export default function CreateAgent() {
       toast.error("Please enter an OpenRouter model slug (e.g. meta-llama/llama-3.1-8b-instruct)");
       return;
     }
+    // Require a password when first enabling protection (editing can leave it blank to keep current).
+    if (passwordEnabled && !password.trim() && !existingAgent?.passwordEnabled) {
+      toast.error("Set a password or turn off Password Protection");
+      return;
+    }
 
     const agentData: Omit<Agent, "id" | "createdAt" | "messages" | "conversations" | "rating" | "active"> = {
       name: name.trim(),
@@ -303,6 +309,7 @@ export default function CreateAgent() {
       sources,
       chunks,
       passwordEnabled,
+      password: password.trim() || undefined,
       rateLimitEnabled,
       rateLimitPerHour,
       domains,
@@ -815,11 +822,19 @@ export default function CreateAgent() {
                     </button>
                   </div>
                   {passwordEnabled && (
-                    <input
-                      type="password"
-                      placeholder="Set password"
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    />
+                    <div>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={existingAgent?.passwordEnabled ? "Enter a new password (leave blank to keep current)" : "Set a password"}
+                        autoComplete="new-password"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                      <p className="text-[10px] text-foreground-muted mt-1.5">
+                        Visitors must enter this password before they can chat. Stored as a hash — only you know it.
+                      </p>
+                    </div>
                   )}
                   <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
                     <div>

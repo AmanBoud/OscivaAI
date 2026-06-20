@@ -191,6 +191,32 @@ export type Database = {
           },
         ]
       }
+      agent_access: {
+        Row: {
+          agent_id: string
+          password_hash: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          password_hash?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          password_hash?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_access_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: true
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agents: {
         Row: {
           active: boolean

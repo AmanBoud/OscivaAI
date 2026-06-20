@@ -52,6 +52,7 @@ const App = () => {
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/docs" element={<Docs />} />
                 <Route path="/auth" element={<AuthRoute />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
@@ -68,7 +69,6 @@ const App = () => {
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/embed" element={<Embed />} />
                   <Route path="/api-keys" element={<ApiKeys />} />
-                  <Route path="/docs" element={<Docs />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />

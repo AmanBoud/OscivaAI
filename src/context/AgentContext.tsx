@@ -30,6 +30,8 @@ export interface Agent {
   sources: AgentSource[];
   chunks: AgentChunk[];
   passwordEnabled: boolean;
+  /** Write-only: the plaintext access password to set. Never populated on read. */
+  password?: string;
   rateLimitEnabled: boolean;
   rateLimitPerHour: number;
   domains: string[];
@@ -56,6 +58,28 @@ function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
   return out;
+}
+
+// SHA-256 hex — the access password is hashed before it leaves the browser.
+async function sha256Hex(s: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Persist (or clear) an agent's access password in the owner-only agent_access table.
+async function writeAgentPassword(agentId: string, password: string | undefined, enabled: boolean) {
+  if (!enabled) {
+    // Protection turned off → remove any stored hash.
+    await supabase.from("agent_access").delete().eq("agent_id", agentId);
+    return;
+  }
+  if (password && password.trim()) {
+    const password_hash = await sha256Hex(password.trim());
+    await supabase
+      .from("agent_access")
+      .upsert({ agent_id: agentId, password_hash, updated_at: new Date().toISOString() });
+  }
+  // enabled but no new password provided → keep the existing hash untouched.
 }
 
 function rowToAgent(
@@ -181,6 +205,9 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     if (error || !inserted) throw error;
     const agentId = inserted.id;
 
+    // Store the access password (if any) in the owner-only table.
+    await writeAgentPassword(agentId, agent.password, agent.passwordEnabled);
+
     // Map old client source IDs -> new DB IDs
     const idMap: Record<string, string> = {};
     if (agent.sources.length) {
@@ -239,6 +266,11 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     if (data.active !== undefined) patch.active = data.active;
     if (Object.keys(patch).length) {
       await supabase.from("agents").update(patch).eq("id", id);
+    }
+
+    // Update / clear the access password (owner-only table).
+    if (data.passwordEnabled !== undefined || data.password !== undefined) {
+      await writeAgentPassword(id, data.password, data.passwordEnabled ?? true);
     }
 
     // Replace sources/chunks if provided
