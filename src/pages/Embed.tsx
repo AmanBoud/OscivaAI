@@ -5,8 +5,6 @@ import { toast } from "sonner";
 import { useAgents } from "@/context/AgentContext";
 import { recordAgentActivity } from "@/lib/agentStats";
 
-const embedTabs = ["HTML Snippet", "React / Next.js", "WordPress"];
-
 // Public chat edge function — the same backend the embedded widget uses.
 const CHAT_FN = `${import.meta.env.VITE_SUPABASE_URL ?? "https://ydvzfinuypdjkfnzdpkt.supabase.co"}/functions/v1/chat`;
 
@@ -17,10 +15,28 @@ const configOptions = [
   { key: "data-api", type: "string", desc: "Osciva chat endpoint (pre-filled, don't change)" },
 ];
 
+const installSteps = [
+  {
+    title: "Copy the snippet",
+    body: "Hit Copy above. It's a single <script> tag — no build step, no dependencies, no npm install.",
+  },
+  {
+    title: "Open your site's HTML",
+    body: "Edit the page's source, your theme's global template, or your CMS's “custom HTML / footer code” box. Anywhere you can add raw HTML works.",
+  },
+  {
+    title: "Paste it right before </body>",
+    body: "Drop the snippet just above the closing </body> tag. Putting it at the end of the page means the widget never blocks your content from loading.",
+  },
+  {
+    title: "Save & publish, then reload",
+    body: "Refresh the live page — a chat bubble appears in the corner. That's it; the widget pulls its config, knowledge base, and styling from this agent automatically.",
+  },
+];
+
 export default function Embed() {
   const { agents } = useAgents();
   const [selectedAgent, setSelectedAgent] = useState(0);
-  const [activeTab, setActiveTab] = useState(0);
   const [copied, setCopied] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -39,35 +55,8 @@ export default function Embed() {
   data-api="${CHAT_FN}"></script>`
     : "";
 
-  const reactSnippet = currentAgent
-    ? `import { useEffect } from "react";
-
-export function OscivaChat() {
-  useEffect(() => {
-    const s = document.createElement("script");
-    s.src = "${widgetSrc}";
-    s.async = true;
-    s.setAttribute("data-agent-id", "${currentAgent.id}");
-    s.setAttribute("data-api", "${CHAT_FN}");
-    document.body.appendChild(s);
-    return () => { s.remove(); };
-  }, []);
-  return null;
-}`
-    : "";
-
-  const wpSnippet = currentAgent
-    ? `<?php
-// Add to your theme's footer.php right before </body>
-add_action('wp_footer', function() { ?>
-${htmlSnippet}
-<?php });`
-    : "";
-
-  const snippets = [htmlSnippet, reactSnippet, wpSnippet];
-
   const copyCode = () => {
-    navigator.clipboard.writeText(snippets[activeTab]);
+    navigator.clipboard.writeText(htmlSnippet);
     setCopied(true);
     toast.success("Copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
@@ -134,18 +123,9 @@ ${htmlSnippet}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
-                <div className="flex gap-1 p-1 bg-secondary rounded-lg">
-                  {embedTabs.map((t, i) => (
-                    <button
-                      key={t}
-                      onClick={() => setActiveTab(i)}
-                      className={`flex-1 py-2 text-[10px] font-semibold rounded-md transition-all ${
-                        activeTab === i ? "bg-primary text-primary-foreground" : "text-foreground-muted hover:text-foreground"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">HTML embed snippet</h2>
+                  <p className="text-[11px] text-foreground-muted mt-0.5">One script tag. Works on any website or CMS that lets you add HTML.</p>
                 </div>
 
                 <div className="glass-card p-4 relative">
@@ -157,8 +137,50 @@ ${htmlSnippet}
                     {copied ? "Copied!" : "Copy"}
                   </button>
                   <pre className="text-[11px] text-foreground-secondary overflow-x-auto leading-relaxed font-mono whitespace-pre-wrap max-h-[480px] overflow-y-auto">
-                    {snippets[activeTab]}
+                    {htmlSnippet}
                   </pre>
+                </div>
+
+                <div className="glass-card p-5 space-y-5">
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">How &amp; where to embed</h3>
+                    <p className="text-[11px] text-foreground-muted mt-0.5">Four steps from copy to a live chat bubble.</p>
+                  </div>
+
+                  <ol className="space-y-3">
+                    {installSteps.map((s, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center mt-0.5">
+                          {i + 1}
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold text-foreground">{s.title}</p>
+                          <p className="text-[11px] text-foreground-muted leading-relaxed mt-0.5">{s.body}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+
+                  <div className="border-t border-border pt-4">
+                    <h4 className="text-xs font-semibold text-foreground-secondary mb-2">Where it shows up</h4>
+                    <p className="text-[11px] text-foreground-muted leading-relaxed">
+                      The widget injects a floating chat launcher pinned to the bottom corner of the page (left or right, per the agent's
+                      Appearance settings) — it doesn't take over your layout. Add the snippet to a global template/footer to load it
+                      site-wide, or to a single page's HTML to scope it to that page only.
+                    </p>
+                  </div>
+
+                  <div className="border-t border-border pt-4">
+                    <h4 className="text-xs font-semibold text-foreground-secondary mb-2">Technical notes</h4>
+                    <ul className="space-y-1.5 text-[11px] text-foreground-muted leading-relaxed list-disc pl-4">
+                      <li>The script is loaded <span className="text-foreground-secondary">async</span> and renders into its own container, so it never blocks page render.</li>
+                      <li>Add it <span className="text-foreground-secondary">once per page</span> — a second copy of the tag will load a duplicate widget.</li>
+                      <li>
+                        <span className="text-foreground-secondary">data-agent-id</span> is required; <span className="text-foreground-secondary">data-api</span> is pre-filled — leave it as-is.
+                      </li>
+                      <li>No cookies, no framework, no build step — it runs on plain HTML, React, Vue, Webflow, Shopify, WordPress, or any host that allows a script tag.</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 

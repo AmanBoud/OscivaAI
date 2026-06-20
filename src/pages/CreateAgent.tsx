@@ -89,12 +89,11 @@ export default function CreateAgent() {
   const [suggestions, setSuggestions] = useState(existingAgent?.suggestions ?? ["What services do you offer?", "How can I contact support?"]);
   const [newSuggestion, setNewSuggestion] = useState("");
   const [position, setPosition] = useState<"left" | "right">(existingAgent?.position ?? "right");
-  const [passwordEnabled, setPasswordEnabled] = useState(existingAgent?.passwordEnabled ?? false);
-  const [password, setPassword] = useState("");
+  // Password Protection + Domain Whitelist are no longer editable in the UI; existing values are preserved as-is.
+  const passwordEnabled = existingAgent?.passwordEnabled ?? false;
+  const domains = existingAgent?.domains ?? [];
   const [rateLimitEnabled, setRateLimitEnabled] = useState(existingAgent?.rateLimitEnabled ?? true);
   const [rateLimitPerHour, setRateLimitPerHour] = useState(existingAgent?.rateLimitPerHour ?? 20);
-  const [domains, setDomains] = useState<string[]>(existingAgent?.domains ?? []);
-  const [newDomain, setNewDomain] = useState("");
   const [urlInput, setUrlInput] = useState("");
 
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([]);
@@ -289,12 +288,6 @@ export default function CreateAgent() {
       toast.error("Please enter an OpenRouter model slug (e.g. meta-llama/llama-3.1-8b-instruct)");
       return;
     }
-    // Require a password when first enabling protection (editing can leave it blank to keep current).
-    if (passwordEnabled && !password.trim() && !existingAgent?.passwordEnabled) {
-      toast.error("Set a password or turn off Password Protection");
-      return;
-    }
-
     const agentData: Omit<Agent, "id" | "createdAt" | "messages" | "conversations" | "rating" | "active"> = {
       name: name.trim(),
       instructions,
@@ -309,7 +302,7 @@ export default function CreateAgent() {
       sources,
       chunks,
       passwordEnabled,
-      password: password.trim() || undefined,
+      password: undefined,
       rateLimitEnabled,
       rateLimitPerHour,
       domains,
@@ -811,33 +804,6 @@ export default function CreateAgent() {
                 <>
                   <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
                     <div>
-                      <div className="text-xs font-semibold text-foreground">Password Protection</div>
-                      <div className="text-[10px] text-foreground-muted">Require a password to access this agent</div>
-                    </div>
-                    <button
-                      onClick={() => setPasswordEnabled(!passwordEnabled)}
-                      className={`w-10 h-5 rounded-full transition-all relative ${passwordEnabled ? "bg-primary" : "bg-border"}`}
-                    >
-                      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-foreground transition-all ${passwordEnabled ? "left-5" : "left-0.5"}`} />
-                    </button>
-                  </div>
-                  {passwordEnabled && (
-                    <div>
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder={existingAgent?.passwordEnabled ? "Enter a new password (leave blank to keep current)" : "Set a password"}
-                        autoComplete="new-password"
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      />
-                      <p className="text-[10px] text-foreground-muted mt-1.5">
-                        Visitors must enter this password before they can chat. Stored as a hash — only you know it.
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
-                    <div>
                       <div className="text-xs font-semibold text-foreground">Rate Limiting</div>
                       <div className="text-[10px] text-foreground-muted">Caps messages per visitor each hour — protects your API costs.</div>
                     </div>
@@ -864,39 +830,6 @@ export default function CreateAgent() {
                       />
                     </div>
                   )}
-                  <div>
-                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Domain Whitelist</label>
-                    <div className="flex gap-2 mb-2">
-                      <input
-                        value={newDomain}
-                        onChange={(e) => setNewDomain(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && newDomain.trim()) {
-                            setDomains((prev) => [...prev, newDomain.trim()]);
-                            setNewDomain("");
-                          }
-                        }}
-                        placeholder="example.com"
-                        className="flex-1 px-3.5 py-2 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      />
-                      <button
-                        onClick={() => { if (newDomain.trim()) { setDomains((prev) => [...prev, newDomain.trim()]); setNewDomain(""); } }}
-                        className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold"
-                      >
-                        Add
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {domains.map((d, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary text-xs text-foreground-secondary">
-                          {d}
-                          <button onClick={() => setDomains((prev) => prev.filter((_, j) => j !== i))}>
-                            <X size={10} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
                 </>
               )}
 
