@@ -41,7 +41,7 @@ export default function FooterSection() {
           <div className="col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <img src="https://osciva.io/images/osciva-web.png" alt="Osciva" className="h-8 w-8" />
-              <span className="text-[16px] font-bold text-white tracking-[-0.02em]">Osciva <span className="text-[#0EC2A8]">AI</span></span>
+              <span className="text-[16px] font-bold text-white tracking-[-0.02em]">Osciva <span className="text-[#E8613C]">AI</span></span>
             </div>
             <p className="text-[13.5px] text-white/55 leading-relaxed max-w-xs mb-6">
               The no-code platform to build, train and deploy AI assistants on your own data — in minutes.

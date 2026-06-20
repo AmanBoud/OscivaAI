@@ -4,7 +4,6 @@ import HighlightsSection from "@/components/landing/HighlightsSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import BenefitsSection from "@/components/landing/BenefitsSection";
-import IntegrationsSection from "@/components/landing/IntegrationsSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
@@ -20,7 +19,6 @@ export default function Landing() {
       <HowItWorksSection />
       <FeaturesSection />
       <BenefitsSection />
-      <IntegrationsSection />
       <TestimonialsSection />
       <PricingSection />
       <FAQSection />

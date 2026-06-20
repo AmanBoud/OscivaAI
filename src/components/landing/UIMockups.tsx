@@ -33,8 +33,8 @@ export function DashboardMockup() {
         {/* Sidebar */}
         <div className="hidden sm:block w-[124px] bg-[#0B0E14] p-3 space-y-1">
           <div className="flex items-center gap-2 mb-4 px-1">
-            <div className="w-5 h-5 rounded-md bg-[#0EC2A8]" />
-            <span className="text-[10px] font-bold text-white">Osciva <span className="text-[#0EC2A8]">AI</span></span>
+            <div className="w-5 h-5 rounded-md bg-[#E8613C]" />
+            <span className="text-[10px] font-bold text-white">Osciva <span className="text-[#E8613C]">AI</span></span>
           </div>
           {["Dashboard", "Agents", "Create", "Analytics", "Embed", "API keys"].map((l, i) => (
             <div
@@ -43,7 +43,7 @@ export function DashboardMockup() {
                 i === 0 ? "bg-white/10 text-white font-semibold" : "text-white/45"
               }`}
             >
-              <span className={`w-1 h-1 rounded-full ${i === 0 ? "bg-[#0EC2A8]" : "bg-white/25"}`} />
+              <span className={`w-1 h-1 rounded-full ${i === 0 ? "bg-[#E8613C]" : "bg-white/25"}`} />
               {l}
             </div>
           ))}
@@ -66,7 +66,7 @@ export function DashboardMockup() {
           {/* Stat cards */}
           <div className="grid grid-cols-3 gap-2 mb-3">
             {[
-              { l: "Agents", v: "12", c: "#0EC2A8" },
+              { l: "Agents", v: "12", c: "#E8613C" },
               { l: "Messages", v: "8.4k", c: "#16A34A" },
               { l: "Resolved", v: "94%", c: "#2563EB" },
             ].map((s, i) => (
@@ -102,7 +102,7 @@ export function DashboardMockup() {
                     height: `${h}%`,
                     background:
                       i === bars.length - 2
-                        ? "#0EC2A8"
+                        ? "#E8613C"
                         : "linear-gradient(180deg,#F3C5B5,#FBE7DF)",
                   }}
                   initial={{ scaleY: 0 }}
@@ -161,7 +161,7 @@ export function WizardMockup() {
             <div className="h-8 rounded-lg bg-[#FBFBFC] border border-[#EBEDF0] flex items-center px-2.5 text-[10px] text-[#0B0E14]">
               My Support Bot
               <motion.span
-                className="ml-0.5 w-px h-3 bg-[#0EC2A8]"
+                className="ml-0.5 w-px h-3 bg-[#E8613C]"
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 1.1, repeat: Infinity }}
               />
@@ -187,7 +187,7 @@ export function WizardMockup() {
               </div>
             ))}
           </div>
-          <div className="h-9 rounded-lg bg-[#0EC2A8] flex items-center justify-center text-[10px] font-semibold text-white shadow-brand">
+          <div className="h-9 rounded-lg bg-[#E8613C] flex items-center justify-center text-[10px] font-semibold text-white shadow-brand">
             Create agent
           </div>
         </div>
@@ -228,7 +228,7 @@ export function WidgetMockup() {
           className="absolute bottom-4 right-4 w-[235px] rounded-2xl overflow-hidden shadow-float border border-[#0B0E14]/10 bg-white"
         >
           <div className="bg-[#0B0E14] px-3.5 py-3 flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-[#0EC2A8] flex items-center justify-center text-[10px] font-bold text-white">
+            <div className="w-6 h-6 rounded-full bg-[#E8613C] flex items-center justify-center text-[10px] font-bold text-white">
               S
             </div>
             <div>
@@ -271,7 +271,7 @@ export function WidgetMockup() {
             <div className="flex-1 px-2.5 py-1.5 rounded-full text-[9px] text-[#9CA3AF] border border-[#EBEDF0]">
               Type a message…
             </div>
-            <div className="w-6 h-6 rounded-full bg-[#0EC2A8] flex items-center justify-center text-white text-[9px]">
+            <div className="w-6 h-6 rounded-full bg-[#E8613C] flex items-center justify-center text-white text-[9px]">
               ➤
             </div>
           </div>

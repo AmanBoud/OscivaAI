@@ -67,6 +67,7 @@ export default function PricingSection() {
     <section id="pricing" className="bg-white py-20 md:py-28 px-5 sm:px-6">
       <div className="max-w-[1180px] mx-auto">
         <SectionHeading
+          eyebrow="Pricing"
           title="Simple, transparent pricing"
           subtitle="Start free. Scale as you grow. INR pricing with GST invoices — no hidden fees."
         />
@@ -85,7 +86,7 @@ export default function PricingSection() {
                 className={`px-5 py-2 rounded-full text-[13px] font-semibold transition-all flex items-center gap-2 ${yearly ? "bg-white text-[#0B0E14] shadow-sm" : "text-[#8C94A1]"}`}
               >
                 Yearly
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#FFF1EC] text-[#0EC2A8]">SAVE 20%</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#FFF1EC] text-[#E8613C]">SAVE 20%</span>
               </button>
             </div>
           </div>
@@ -97,12 +98,12 @@ export default function PricingSection() {
               <div
                 className={`relative h-full rounded-3xl p-7 flex flex-col transition-all duration-300 ${
                   plan.popular
-                    ? "bg-[#0B0E14] text-white shadow-premium ring-1 ring-[#0EC2A8]/40"
+                    ? "bg-[#0B0E14] text-white shadow-premium ring-1 ring-[#E8613C]/40"
                     : "bg-white border border-[#EBEDF0] hover:shadow-premium hover:-translate-y-1"
                 }`}
               >
                 {plan.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-[#0EC2A8] text-white text-[11px] font-bold tracking-wide shadow-brand">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-[#E8613C] text-white text-[11px] font-bold tracking-wide shadow-brand">
                     MOST POPULAR
                   </span>
                 )}
@@ -123,7 +124,7 @@ export default function PricingSection() {
                   onClick={() => navigate("/auth")}
                   className={`w-full py-3 rounded-full text-[14px] font-semibold transition-all mb-6 ${
                     plan.popular
-                      ? "bg-[#0EC2A8] text-white hover:bg-[#0AA593] shadow-brand"
+                      ? "bg-[#E8613C] text-white hover:bg-[#CF4F2C] shadow-brand"
                       : "bg-[#0B0E14] text-white hover:bg-[#1b2030]"
                   }`}
                 >
@@ -133,7 +134,7 @@ export default function PricingSection() {
                 <ul className="space-y-3 mt-auto">
                   {plan.features.map((f) => (
                     <li key={f} className={`flex items-start gap-2.5 text-[13px] ${plan.popular ? "text-white/80" : "text-[#586072]"}`}>
-                      <Check size={15} className={`mt-0.5 shrink-0 ${plan.popular ? "text-[#0EC2A8]" : "text-[#16A34A]"}`} />
+                      <Check size={15} className={`mt-0.5 shrink-0 ${plan.popular ? "text-[#E8613C]" : "text-[#16A34A]"}`} />
                       <span>{f}</span>
                     </li>
                   ))}

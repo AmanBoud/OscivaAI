@@ -37,7 +37,7 @@ export default function LandingNavbar() {
             alt="Osciva"
             className="h-8 w-8 transition-transform group-hover:scale-105"
           />
-          <span className="text-[17px] font-bold tracking-[-0.02em] text-[#0B0E14]">Osciva <span className="text-[#0EC2A8]">AI</span></span>
+          <span className="text-[17px] font-bold tracking-[-0.02em] text-[#0B0E14]">Osciva <span className="text-[#E8613C]">AI</span></span>
         </a>
 
         <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
@@ -61,9 +61,9 @@ export default function LandingNavbar() {
           </button>
           <button
             onClick={() => navigate("/auth")}
-            className="group flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0EC2A8] text-white text-[14px] font-semibold hover:bg-[#0AA593] transition-colors shadow-[0_8px_20px_-8px_rgba(14,194,168,0.7)]"
+            className="group flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0B0E14] text-white text-[14px] font-semibold hover:bg-[#1b2030] transition-colors"
           >
-            Start Free Trial
+            Get started
             <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
@@ -106,9 +106,9 @@ export default function LandingNavbar() {
                 setMobileOpen(false);
                 navigate("/auth");
               }}
-              className="w-full py-3 rounded-full bg-[#0EC2A8] text-white text-[15px] font-semibold"
+              className="w-full py-3 rounded-full bg-[#0B0E14] text-white text-[15px] font-semibold"
             >
-              Start Free Trial
+              Get started
             </button>
           </div>
         </div>

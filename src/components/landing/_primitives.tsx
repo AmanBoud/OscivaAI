@@ -8,8 +8,8 @@ export const C = {
   mute: "#8C94A1",
   line: "#EBEDF0",
   soft: "#F7F8FA",
-  brand: "#0EC2A8",
-  brandDk: "#0AA593",
+  brand: "#E8613C",
+  brandDk: "#CF4F2C",
   brandSoft: "#FFF1EC",
 } as const;
 
@@ -55,8 +55,8 @@ export function Reveal({
 /** Small uppercase label above section titles. */
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <span className="eyebrow text-[#0EC2A8]">
-      <span className="h-1.5 w-1.5 rounded-full bg-[#0EC2A8]" />
+    <span className="eyebrow text-[#E8613C]">
+      <span className="h-1.5 w-1.5 rounded-full bg-[#E8613C]" />
       {children}
     </span>
   );
