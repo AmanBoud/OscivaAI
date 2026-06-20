@@ -840,36 +840,11 @@ Always answer from the knowledge base.          // Behaviour`}
   data-agent-id="YOUR_AGENT_ID"
   data-api="${CHAT_FN}"></script>`}
       />
-
-      <H2>React / Next.js</H2>
-      <CodeBlock
-        label="OscivaChat.tsx"
-        code={`import { useEffect } from "react";
-
-export function OscivaChat() {
-  useEffect(() => {
-    const s = document.createElement("script");
-    s.src = "${WIDGET_SRC}";
-    s.async = true;
-    s.setAttribute("data-agent-id", "YOUR_AGENT_ID");
-    s.setAttribute("data-api", "${CHAT_FN}");
-    document.body.appendChild(s);
-    return () => { s.remove(); };
-  }, []);
-  return null;
-}`}
-      />
-
-      <H2>WordPress</H2>
-      <P>Add to your theme's <Code>functions.php</Code> (or a code-snippets plugin):</P>
-      <CodeBlock
-        label="functions.php"
-        code={`add_action('wp_footer', function () { ?>
-<script src="${WIDGET_SRC}"
-  data-agent-id="YOUR_AGENT_ID"
-  data-api="${CHAT_FN}"></script>
-<?php });`}
-      />
+      <P>
+        It's a single script tag, so it works the same way on any host that lets you add HTML — a static site, a CMS, or a
+        framework like React, Vue, or WordPress. Add it to a global template/footer to load it site-wide, or to one page's
+        HTML to scope it there.
+      </P>
 
       <H2>Attributes</H2>
       <Table
@@ -1178,7 +1153,7 @@ data: [DONE]`}
       <P>PDF, DOCX, and TXT files, plus website URLs. See <Code>Knowledge base (RAG)</Code>.</P>
 
       <H3>Does the widget work on any website?</H3>
-      <P>Yes — plain HTML, React/Next.js, WordPress, Shopify, and more. It's a single script tag, isolated in a Shadow DOM.</P>
+      <P>Yes — it's a single HTML script tag, isolated in a Shadow DOM, so it runs on any site or CMS that lets you add HTML.</P>
 
       <H3>Is there token markup?</H3>
       <P>No. Because it's bring-your-own-key, you pay your provider directly at their rates.</P>
