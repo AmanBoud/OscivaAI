@@ -67,7 +67,6 @@ export default function PricingSection() {
     <section id="pricing" className="bg-white py-20 md:py-28 px-5 sm:px-6">
       <div className="max-w-[1180px] mx-auto">
         <SectionHeading
-          eyebrow="Pricing"
           title="Simple, transparent pricing"
           subtitle="Start free. Scale as you grow. INR pricing with GST invoices — no hidden fees."
         />

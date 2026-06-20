@@ -15,7 +15,6 @@ export default function BenefitsSection() {
     <section className="bg-white py-20 md:py-28 px-5 sm:px-6">
       <div className="max-w-[1200px] mx-auto">
         <SectionHeading
-          eyebrow="Outcomes"
           title="An assistant that works like your best employee"
           subtitle="Accurate, always-on, and on-brand — without the overhead of hiring and training."
         />

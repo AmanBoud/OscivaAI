@@ -18,7 +18,7 @@ export default function FAQSection() {
   return (
     <section id="faq" className="bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
       <div className="max-w-[760px] mx-auto">
-        <SectionHeading eyebrow="FAQ" title="Frequently asked questions" />
+        <SectionHeading title="Frequently asked questions" />
 
         <div className="mt-12 space-y-3">
           {faqs.map((faq, i) => {

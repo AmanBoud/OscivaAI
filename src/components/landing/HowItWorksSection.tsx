@@ -30,7 +30,6 @@ export default function HowItWorksSection() {
     <section id="how-it-works" className="relative bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
       <div className="max-w-[1200px] mx-auto">
         <SectionHeading
-          eyebrow="How it works"
           title="From idea to live AI in three steps"
           subtitle="No coding. No glue work. Designed for non-technical founders and teams."
         />

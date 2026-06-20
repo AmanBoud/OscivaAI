@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,8 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', 'Geist', system-ui, sans-serif;
 
     /* Premium cool-neutral surface system */
     --background: 0 0% 100%;
@@ -85,7 +86,7 @@
   body {
     font-family: var(--font-sans);
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    font-feature-settings: "liga" 1, "calt" 1;
     text-rendering: optimizeLegibility;
   }
 
@@ -168,8 +169,7 @@
   }
   .bg-mesh {
     background:
-      radial-gradient(40% 50% at 15% 10%, hsl(14 80% 57% / 0.10) 0%, transparent 60%),
-      radial-gradient(35% 45% at 85% 0%, hsl(217 91% 60% / 0.08) 0%, transparent 55%);
+      radial-gradient(50% 55% at 50% -5%, hsl(14 80% 57% / 0.06) 0%, transparent 60%);
   }
   .mask-fade-x {
     -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
@@ -185,7 +185,8 @@
     @apply inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.14em];
   }
   .display {
-    letter-spacing: -0.03em;
-    line-height: 1.05;
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.04;
   }
 }

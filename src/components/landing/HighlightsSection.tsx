@@ -13,7 +13,6 @@ export default function HighlightsSection() {
     <section className="bg-white py-20 md:py-28 px-5 sm:px-6">
       <div className="max-w-[1200px] mx-auto">
         <SectionHeading
-          eyebrow="Why Osciva"
           title="The fastest path from data to a working AI agent"
           subtitle="Built for non-technical teams who want production-grade results without the production-grade complexity."
         />
