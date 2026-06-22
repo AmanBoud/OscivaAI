@@ -8,6 +8,8 @@ import { chatComplete, MissingApiKeyError, ChatMessage } from "@/lib/aiClient";
 import { extractPdfText, extractUrlText, chunkText, retrieveTopChunks, buildRagSystemPrompt } from "@/lib/rag";
 import { recordAgentActivity } from "@/lib/agentStats";
 import { PROMPT_TEMPLATES, PromptTemplate } from "@/lib/promptTemplates";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const providers = [
   { id: "OpenAI", label: "OpenAI", emoji: "🟢", desc: "GPT-4o & GPT-4o Mini", badge: "bg-green-100 text-green-700" },
@@ -69,6 +71,7 @@ export default function CreateAgent() {
   const navigate = useNavigate();
   const { id: editId } = useParams();
   const { agents, addAgent, updateAgent } = useAgents();
+  const { user } = useAuth();
   const existingAgent = editId ? agents.find((a) => a.id === editId) : null;
 
   const [tab, setTab] = useState(0);
@@ -86,6 +89,12 @@ export default function CreateAgent() {
   const [chunks, setChunks] = useState<AgentChunk[]>(existingAgent?.chunks ?? []);
   const [welcomeMsg, setWelcomeMsg] = useState(existingAgent?.welcomeMsg ?? "Hi 👋 How can I help you today?");
   const [logoUrl, setLogoUrl] = useState(existingAgent?.logoUrl ?? "");
+  // Friendly name for an uploaded logo; truthy means "came from upload" (so we
+  // show the filename instead of the raw storage URL, and hide the URL field).
+  const [logoFileName, setLogoFileName] = useState(
+    (existingAgent?.logoUrl ?? "").includes("/storage/v1/object/public/agent-logos/") ? "Uploaded image" : ""
+  );
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [suggestions, setSuggestions] = useState(existingAgent?.suggestions ?? ["What services do you offer?", "How can I contact support?"]);
   const [newSuggestion, setNewSuggestion] = useState("");
   const [position, setPosition] = useState<"left" | "right">(existingAgent?.position ?? "right");
@@ -108,6 +117,7 @@ export default function CreateAgent() {
   const [personalityOpen, setPersonalityOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const tabs = ["General", "Knowledge Base", "Appearance", "Security", "Preview"];
 
@@ -146,6 +156,42 @@ export default function CreateAgent() {
         prev.map((s) => (s.id === newSource.id ? { ...s, status: "Failed" } : s))
       );
       toast.error(`Failed to index: ${err instanceof Error ? err.message : "unknown error"}`);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
+    if (!file) return;
+    if (!user) {
+      toast.error("Please sign in to upload a logo");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file (PNG, JPG, WebP, SVG…)");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image too large — max 2 MB. Try a smaller file.");
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("agent-logos")
+        .upload(path, file, { cacheControl: "31536000", upsert: false, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("agent-logos").getPublicUrl(path);
+      if (!data?.publicUrl) throw new Error("Could not resolve public URL");
+      setLogoUrl(data.publicUrl);
+      setLogoFileName(file.name);
+      toast.success("Logo uploaded ✓");
+    } catch (err) {
+      toast.error(`Upload failed: ${err instanceof Error ? err.message : "unknown error"}`);
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -733,19 +779,81 @@ export default function CreateAgent() {
               {tab === 2 && (
                 <>
                   <div>
-                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Logo URL (shown in the chat header)</label>
-                    <div className="flex items-center gap-2">
-                      {logoUrl && (
-                        <img src={logoUrl} alt="logo" className="w-9 h-9 rounded-full object-cover border border-border shrink-0" />
-                      )}
-                      <input
-                        value={logoUrl}
-                        onChange={(e) => setLogoUrl(e.target.value)}
-                        placeholder="https://your-site.com/logo.png"
-                        className="flex-1 px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                      />
-                    </div>
-                    <p className="text-[10px] text-foreground-muted mt-1">Paste a public image URL. Leave blank to use the default chat icon.</p>
+                    <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Business Logo (shown in the chat header)</label>
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+
+                    {logoUrl ? (
+                      /* Filled state — preview + replace/remove */
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary border border-border">
+                        <img
+                          src={logoUrl}
+                          alt="logo preview"
+                          className="w-12 h-12 rounded-lg object-contain bg-white border border-border p-1 shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground truncate">{logoFileName || "Logo set"}</p>
+                          <p className="text-[11px] text-foreground-muted">Shown in your chat header</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => logoInputRef.current?.click()}
+                          disabled={uploadingLogo}
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-background border border-border text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {uploadingLogo ? "Uploading…" : "Replace"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setLogoUrl(""); setLogoFileName(""); }}
+                          className="p-1.5 rounded-lg text-foreground-muted hover:text-foreground hover:bg-background transition-all shrink-0"
+                          title="Remove logo"
+                        >
+                          <X size={15} />
+                        </button>
+                      </div>
+                    ) : (
+                      /* Empty state — dashed dropzone */
+                      <button
+                        type="button"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={uploadingLogo}
+                        className="w-full flex items-center gap-2.5 border-2 border-dashed border-border rounded-xl px-3.5 py-2.5 text-left cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <Upload size={15} className="text-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-foreground leading-tight">
+                            {uploadingLogo ? "Uploading…" : "Upload your business logo"}
+                          </p>
+                          <p className="text-[10px] text-foreground-muted">PNG, JPG, WebP or SVG · max 2 MB</p>
+                        </div>
+                      </button>
+                    )}
+
+                    {/* Alternative: paste a URL (hidden once an image has been uploaded) */}
+                    {!logoFileName && (
+                      <>
+                        <div className="flex items-center gap-3 my-2.5">
+                          <div className="h-px flex-1 bg-border" />
+                          <span className="text-[10px] uppercase tracking-wide text-foreground-muted">or paste a URL</span>
+                          <div className="h-px flex-1 bg-border" />
+                        </div>
+                        <input
+                          value={logoUrl}
+                          onChange={(e) => setLogoUrl(e.target.value)}
+                          placeholder="https://your-site.com/logo.png"
+                          className="w-full px-3.5 py-2.5 rounded-lg bg-secondary border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        />
+                      </>
+                    )}
+                    <p className="text-[10px] text-foreground-muted mt-1.5">Leave blank to use the default chat icon.</p>
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-foreground-secondary mb-1.5 block">Welcome Message</label>
@@ -995,10 +1103,9 @@ export default function CreateAgent() {
                     )}
                     <button
                       onClick={() => setWidgetOpen(!widgetOpen)}
-                      className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
-                      style={{ backgroundColor: "#1e293b" }}
+                      className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 bg-white"
                     >
-                      <img src="https://osciva.io/images/osciva-web.png" alt="" className="h-6 w-6" />
+                      <img src="https://osciva.io/images/osciva-web.png" alt="" className="w-full h-full object-contain p-2 rounded-full" />
                     </button>
                   </div>
                 </div>
