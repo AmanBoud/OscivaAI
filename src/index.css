@@ -75,6 +75,71 @@
     --brand: 14 80% 57%;        /* Osciva orange */
     --brand-strong: 14 72% 48%; /* hover */
   }
+
+  /* ===========================================================
+     Premium modern-classic dark theme.
+     Activated by the `dark` class on <html> (see useTheme).
+     Warm-neutral near-black surfaces, restrained elevation,
+     terracotta brand kept recognisable and slightly brighter.
+     =========================================================== */
+  .dark {
+    --background: 224 24% 5.5%;        /* #0a0c10 deep neutral near-black */
+    --background-secondary: 222 20% 8%;
+    --background-tertiary: 220 16% 13%;
+    --background-elevated: 222 20% 10.5%;
+
+    --foreground: 210 20% 97%;         /* soft near-white */
+    --foreground-secondary: 214 12% 73%;
+    --foreground-muted: 216 10% 55%;
+
+    --card: 222 20% 8.5%;              /* lifts clearly off the background */
+    --card-foreground: 210 20% 97%;
+
+    --popover: 222 22% 10%;
+    --popover-foreground: 210 20% 97%;
+
+    --primary: 14 85% 61%;             /* terracotta, a touch brighter on dark */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 14 85% 61%;
+
+    --secondary: 220 14% 15%;
+    --secondary-foreground: 210 20% 97%;
+
+    --muted: 220 14% 14%;
+    --muted-foreground: 216 10% 63%;
+
+    --accent: 14 85% 61%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 52% 51%;
+    --success-foreground: 150 30% 8%;
+
+    --warning: 38 92% 57%;
+    --warning-foreground: 30 30% 10%;
+
+    --info: 217 91% 65%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 12% 21%;             /* present but quiet hairline */
+    --input: 220 12% 21%;
+    --ring: 14 85% 61%;
+
+    --sidebar-background: 224 24% 6.5%;
+    --sidebar-foreground: 214 12% 73%;
+    --sidebar-primary: 14 85% 61%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 13%;
+    --sidebar-accent-foreground: 210 20% 97%;
+    --sidebar-border: 220 12% 15%;
+    --sidebar-ring: 14 85% 61%;
+
+    --ink: 210 20% 97%;
+    --brand: 14 85% 61%;
+    --brand-strong: 14 82% 68%;        /* hover lifts lighter on dark */
+  }
 }
 
 @layer base {

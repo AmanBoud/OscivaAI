@@ -1,6 +1,8 @@
-import { Bell, Search, User, Key, LogOut, Check, Bot, BarChart3, Code2, BookOpen, Settings, X } from "lucide-react";
+import { Bell, Search, User, Key, LogOut, Check, Bot, BarChart3, Code2, BookOpen, Settings, X, Sun, Moon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/hooks/useTheme";
+import { agentAvatarStyle } from "@/lib/agentColor";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +41,7 @@ const pages = [
 
 export default function Topbar({ title, subtitle }: TopbarProps) {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [notifOpen, setNotifOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -99,6 +102,15 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
           <Search size={14} />
           <span className="hidden sm:inline">Search</span>
           <kbd className="hidden sm:inline text-[10px] px-1.5 py-0.5 rounded bg-border font-mono">⌘K</kbd>
+        </button>
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg hover:bg-secondary transition-colors text-foreground-muted hover:text-foreground"
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
         {/* Notifications */}
@@ -215,7 +227,7 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
                   <button key={a.id} onClick={() => goTo(`/agents/edit/${a.id}`)}
                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-left">
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
-                      style={{ backgroundColor: a.color + "20", color: a.color }}>
+                      style={agentAvatarStyle(a.color, theme === "dark")}>
                       {a.name[0]}
                     </div>
                     <div className="flex-1 min-w-0">

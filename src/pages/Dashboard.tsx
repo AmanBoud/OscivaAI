@@ -2,6 +2,8 @@ import Topbar from "@/components/layout/Topbar";
 import { Bot, MessageSquare, MessagesSquare, Clock, TrendingUp, TrendingDown, Plus, ArrowRight, ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAgents } from "@/context/AgentContext";
+import { useTheme } from "@/hooks/useTheme";
+import { agentAvatarStyle } from "@/lib/agentColor";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { getLast7Days, onStatsChanged } from "@/lib/agentStats";
@@ -16,6 +18,7 @@ const cardVariant = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { agents, refreshFromStorage } = useAgents();
+  const { theme } = useTheme();
   const [tick, setTick] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
 
@@ -178,7 +181,7 @@ export default function Dashboard() {
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/60 transition-colors cursor-pointer"
                     onClick={() => navigate(`/agents/edit/${a.id}`)}
                   >
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0" style={{ backgroundColor: a.color + "20", color: a.color }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0" style={agentAvatarStyle(a.color, theme === "dark")}>
                       {a.name[0]?.toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">

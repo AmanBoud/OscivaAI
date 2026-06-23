@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AgentProvider } from "@/context/AgentContext";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { NotificationProvider } from "@/hooks/useNotifications";
+import { ThemeProvider } from "@/hooks/useTheme";
 import AppLayout from "@/components/layout/AppLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { ensureDataVersion } from "@/lib/userStore";
@@ -42,6 +43,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <TooltipProvider>
         <AuthProvider>
           <NotificationProvider>
@@ -80,6 +82,7 @@ const App = () => {
           </NotificationProvider>
         </AuthProvider>
       </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

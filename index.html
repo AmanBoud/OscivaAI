@@ -16,6 +16,17 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Apply theme before paint to avoid a flash. Dark is the default;
+      // only an explicit saved "light" preference opts out.
+      try {
+        if (localStorage.getItem('osciva-theme') !== 'light') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

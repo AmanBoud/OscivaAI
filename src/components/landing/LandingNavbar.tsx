@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 
 const navLinks = [
   { label: "Features", path: "/features" },
@@ -12,8 +13,20 @@ const navLinks = [
 
 export default function LandingNavbar() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
+  const dark = theme === "dark";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const ThemeToggle = (
+    <button
+      onClick={toggleTheme}
+      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      className="flex items-center justify-center w-9 h-9 rounded-full border border-[#E3E6EB] text-[#0B0E14] hover:bg-[#F2F4F7] transition-colors"
+    >
+      {dark ? <Sun size={16} /> : <Moon size={16} />}
+    </button>
+  );
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -53,6 +66,7 @@ export default function LandingNavbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          {ThemeToggle}
           <button
             onClick={() => navigate("/auth")}
             className="px-4 py-2 rounded-full text-[14px] font-semibold text-[#0B0E14] hover:bg-[#F2F4F7] transition-colors"
@@ -68,13 +82,16 @@ export default function LandingNavbar() {
           </button>
         </div>
 
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-[#0B0E14] p-1"
-          aria-label="Menu"
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          {ThemeToggle}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="text-[#0B0E14] p-1"
+            aria-label="Menu"
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {mobileOpen && (

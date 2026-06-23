@@ -1,15 +1,19 @@
 import Topbar from "@/components/layout/Topbar";
-import { Plus, MessageSquare, MessagesSquare, FileText, MoreVertical, Pencil, Code2, Trash2, Bot } from "lucide-react";
+import { Plus, MessageSquare, MessagesSquare, FileText, MoreVertical, Pencil, Code2, Trash2, Bot, Power, PowerOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAgents } from "@/context/AgentContext";
+import { useAgents, type Agent } from "@/context/AgentContext";
+import { useTheme } from "@/hooks/useTheme";
+import { agentAvatarStyle } from "@/lib/agentColor";
 import { toast } from "sonner";
 
 export default function Agents() {
   const navigate = useNavigate();
-  const { agents, deleteAgent, loading, refreshFromStorage } = useAgents();
+  const { agents, deleteAgent, updateAgent, loading, refreshFromStorage } = useAgents();
+  const { theme } = useTheme();
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
 
   useEffect(() => {
     refreshFromStorage();
@@ -19,6 +23,24 @@ export default function Agents() {
     await deleteAgent(id);
     setMenuOpen(null);
     toast.success(`"${name}" deleted`);
+  };
+
+  const handleToggleActive = async (a: Agent) => {
+    if (toggling) return;
+    const next = !a.active;
+    setToggling(a.id);
+    try {
+      await updateAgent(a.id, { active: next });
+      toast.success(
+        next
+          ? `"${a.name}" is live and responding`
+          : `"${a.name}" is paused — it won't reply until you turn it back on`,
+      );
+    } catch {
+      toast.error("Couldn't update the agent. Please try again.");
+    } finally {
+      setToggling(null);
+    }
   };
 
   if (loading) {
@@ -71,7 +93,7 @@ export default function Agents() {
               <div className="flex items-start gap-3 mb-5">
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center text-lg font-bold shrink-0"
-                  style={{ backgroundColor: a.color + "20", color: a.color }}
+                  style={agentAvatarStyle(a.color, theme === "dark")}
                 >
                   {a.name[0]?.toUpperCase()}
                 </div>
@@ -99,6 +121,15 @@ export default function Agents() {
                         <button onClick={() => { setMenuOpen(null); navigate("/embed"); }} className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-foreground-secondary hover:bg-secondary">
                           <Code2 size={13} /> Embed
                         </button>
+                        <button
+                          onClick={() => { setMenuOpen(null); handleToggleActive(a); }}
+                          disabled={toggling === a.id}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-foreground-secondary hover:bg-secondary disabled:opacity-50"
+                        >
+                          {a.active ? <PowerOff size={13} /> : <Power size={13} />}
+                          {a.active ? "Deactivate" : "Activate"}
+                        </button>
+                        <div className="my-1 border-t border-border" />
                         <button onClick={() => handleDelete(a.id, a.name)} className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-destructive hover:bg-destructive/10">
                           <Trash2 size={13} /> Delete
                         </button>

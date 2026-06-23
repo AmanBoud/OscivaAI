@@ -1,0 +1,143 @@
+/* ============================================================
+   Global dark-mode overrides for HARDCODED hex utilities.
+   Scoped to `.dark` (set on <html> by useTheme). Token-based
+   UI is handled by the .dark{} block in index.css; this file
+   only re-skins the literal #hex colors the pages hardcode.
+   The whole hardcoded-color dark mapping lives here, so it is
+   easy to audit and to remove.
+   ============================================================ */
+
+/* ---- White / off-white card surfaces -> elevated dark ---- */
+.dark .bg-white,
+.dark .hover\:bg-white:hover,
+.dark .focus\:bg-white:focus,
+.dark .bg-\[\#FBFBFC\],
+.dark .hover\:bg-\[\#FBFBFC\]:hover,
+.dark .bg-\[\#FCFBF8\],
+.dark .bg-\[\#FFFFFF\] {
+  background-color: #0f1217;
+}
+
+/* ---- Light grey fills -> raised dark surface ---- */
+.dark .bg-\[\#F7F8FA\],
+.dark .hover\:bg-\[\#F7F8FA\]:hover,
+.dark .bg-\[\#F2F4F7\],
+.dark .hover\:bg-\[\#F2F4F7\]:hover,
+.dark .bg-\[\#EFF1F4\],
+.dark .bg-\[\#EEF1F5\],
+.dark .bg-\[\#EAEDF1\],
+.dark .bg-\[\#F1F5F9\],
+.dark .bg-\[\#F1F3F6\] {
+  background-color: #161a21;
+}
+
+/* ---- Solid light dividers / skeleton fills ---- */
+.dark .bg-\[\#EBEDF0\],
+.dark .bg-\[\#CBD5E1\],
+.dark .bg-\[\#E2E8F0\],
+.dark .bg-\[\#D6DBE6\],
+.dark .bg-\[\#C7CDD6\] {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ---- Translucent navbar on scroll ---- */
+.dark .bg-white\/80 {
+  background-color: rgba(13, 16, 20, 0.80);
+}
+
+/* ---- Light brand (orange) tints -> dark accent tint ---- */
+.dark .bg-\[\#FFF1EC\],
+.dark .bg-\[\#FFF8F5\],
+.dark .hover\:bg-\[\#FFF8F5\]:hover,
+.dark .bg-\[\#FFF6EC\],
+.dark .bg-\[\#FBE7DF\],
+.dark .group:hover .group-hover\:bg-\[\#FFF1EC\] {
+  background-color: rgba(232, 97, 60, 0.14);
+}
+.dark .bg-\[\#FFE2C2\],
+.dark .bg-\[\#F3C5B5\] {
+  background-color: rgba(232, 97, 60, 0.20);
+}
+
+/* ---- Light blue / green tints -> dark tints ---- */
+.dark .bg-\[\#F0F6FF\],
+.dark .bg-\[\#D6E6FF\] {
+  background-color: rgba(37, 99, 235, 0.14);
+}
+.dark .bg-\[\#F0FBF4\],
+.dark .bg-\[\#CBEFD7\] {
+  background-color: rgba(22, 163, 74, 0.14);
+}
+
+/* ---- Primary ink text -> off-white ---- */
+.dark .text-\[\#0B0E14\],
+.dark .hover\:text-\[\#0B0E14\]:hover,
+.dark .text-\[\#1F2733\] {
+  color: #f1f4f9;
+}
+.dark .text-\[\#0B0E14\]\/30 {
+  color: rgba(241, 244, 249, 0.32);
+}
+
+/* ---- Mid slate text -> bright grey ---- */
+.dark .text-\[\#1E293B\],
+.dark .text-\[\#3a4150\],
+.dark .text-\[\#374151\] {
+  color: #c9ced8;
+}
+
+/* ---- Secondary / muted text -> grey ramp ---- */
+.dark .text-\[\#586072\] {
+  color: #aab2bf;
+}
+.dark .text-\[\#8C94A1\],
+.dark .text-\[\#A2AAB6\],
+.dark .text-\[\#9CA3AF\],
+.dark .text-\[\#C7CDD6\],
+.dark .text-\[\#d6dbe6\],
+.dark .text-\[\#C2C7D0\],
+.dark .text-\[\#AAB0BB\],
+.dark .text-\[\#8990A0\] {
+  color: #8a92a0;
+}
+
+/* ---- Hairline borders -> light-on-dark ---- */
+.dark .border-\[\#EBEDF0\],
+.dark .border-\[\#E3E6EB\],
+.dark .border-\[\#EAEDF1\],
+.dark .border-\[\#E2E8F0\],
+.dark .border-\[\#F2F4F7\],
+.dark .border-\[\#F1F3F6\],
+.dark .border-\[\#D6DBE6\],
+.dark .border-\[\#C7CDD6\] {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+.dark .border-\[\#CBD5E1\] {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.dark .border-\[\#0B0E14\]\/10 {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ---- Decorative gradient stops ---- */
+.dark .from-\[\#F7F8FA\] {
+  --tw-gradient-from: #161a21 var(--tw-gradient-from-position) !important;
+}
+.dark .from-\[\#EBEDF0\] {
+  --tw-gradient-from: rgba(255, 255, 255, 0.08) var(--tw-gradient-from-position) !important;
+}
+.dark .to-white {
+  --tw-gradient-to: #0f1217 var(--tw-gradient-to-position) !important;
+}
+
+/* ---- Decorative grid lines -> visible on dark ---- */
+.dark .bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Intentionally left untouched (already read well on dark surfaces):
+   accent #E8613C / #CF4F2C, success #16A34A, info #2563EB,
+   destructive #EF4444, brand/provider logos, text-white, fill-white,
+   and the already-dark fills (#0B0E14, #1b2030, #1C2130, #101319). */
