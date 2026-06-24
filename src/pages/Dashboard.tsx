@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useAgents } from "@/context/AgentContext";
 import { useTheme } from "@/hooks/useTheme";
 import { agentAvatarStyle } from "@/lib/agentColor";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { getLast7Days, onStatsChanged } from "@/lib/agentStats";
+import { useAuth } from "@/hooks/useAuth";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { agents, refreshFromStorage } = useAgents();
   const { theme } = useTheme();
+  const { profile, user } = useAuth();
   const [tick, setTick] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<number>(Date.now());
 
@@ -58,6 +60,24 @@ export default function Dashboard() {
   const updatedAgo = Math.max(0, Math.floor((Date.now() - lastUpdated) / 1000));
   const greeting = new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening";
 
+  // First name for the greeting (from profile, falling back to email local part)
+  const firstName = useMemo(() => {
+    const raw = profile?.name?.trim() || user?.email?.split("@")[0] || "there";
+    const first = raw.split(/[\s._-]+/)[0];
+    return first.charAt(0).toUpperCase() + first.slice(1);
+  }, [profile?.name, user?.email]);
+
+  // Rotating greeting phrases (cycles every few seconds)
+  const phrases = useMemo(
+    () => [`Good ${greeting}, ${firstName}`, `Let's build, ${firstName}`, `Welcome back, ${firstName}`],
+    [greeting, firstName],
+  );
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setPhraseIdx((i) => (i + 1) % phrases.length), 3500);
+    return () => clearInterval(id);
+  }, [phrases.length]);
+
   return (
     <>
       <Topbar title="Dashboard" subtitle="Welcome back to Osciva AI" />
@@ -73,7 +93,18 @@ export default function Dashboard() {
           <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-primary/25 blur-[90px]" aria-hidden />
           <div className="relative flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-[20px] font-extrabold text-white display">Good {greeting}</h2>
+              <AnimatePresence mode="wait">
+                <motion.h2
+                  key={phraseIdx}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.35, ease: EASE }}
+                  className="text-[20px] font-extrabold text-white display"
+                >
+                  {phrases[phraseIdx]}
+                </motion.h2>
+              </AnimatePresence>
               <p className="text-[13.5px] text-white/60 mt-1">Here's how your AI agents are performing today.</p>
               <p className="text-[11px] text-white/40 mt-2">Updated {updatedAgo < 5 ? "just now" : `${updatedAgo}s ago`}</p>
             </div>
