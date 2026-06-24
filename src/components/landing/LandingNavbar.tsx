@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Menu, X, ArrowRight, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { label: "Features", path: "/features" },
@@ -14,6 +15,7 @@ const navLinks = [
 export default function LandingNavbar() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const dark = theme === "dark";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -67,19 +69,31 @@ export default function LandingNavbar() {
 
         <div className="hidden md:flex items-center gap-2">
           {ThemeToggle}
-          <button
-            onClick={() => navigate("/auth")}
-            className="px-4 py-2 rounded-full text-[14px] font-semibold text-[#0B0E14] hover:bg-[#F2F4F7] transition-colors"
-          >
-            Sign in
-          </button>
-          <button
-            onClick={() => navigate("/auth")}
-            className="group flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0B0E14] text-white text-[14px] font-semibold hover:bg-[#1b2030] transition-colors"
-          >
-            Get started
-            <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-          </button>
+          {user ? (
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="group flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0B0E14] text-white text-[14px] font-semibold hover:bg-[#1b2030] transition-colors"
+            >
+              Go to dashboard
+              <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate("/auth")}
+                className="px-4 py-2 rounded-full text-[14px] font-semibold text-[#0B0E14] hover:bg-[#F2F4F7] transition-colors"
+              >
+                Sign in
+              </button>
+              <button
+                onClick={() => navigate("/auth")}
+                className="group flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#0B0E14] text-white text-[14px] font-semibold hover:bg-[#1b2030] transition-colors"
+              >
+                Get started
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </>
+          )}
         </div>
 
         <div className="md:hidden flex items-center gap-2">
@@ -109,24 +123,38 @@ export default function LandingNavbar() {
             </button>
           ))}
           <div className="pt-3 flex flex-col gap-2">
-            <button
-              onClick={() => {
-                setMobileOpen(false);
-                navigate("/auth");
-              }}
-              className="w-full py-3 rounded-full border border-[#E3E6EB] text-[15px] font-semibold text-[#0B0E14]"
-            >
-              Sign in
-            </button>
-            <button
-              onClick={() => {
-                setMobileOpen(false);
-                navigate("/auth");
-              }}
-              className="w-full py-3 rounded-full bg-[#0B0E14] text-white text-[15px] font-semibold"
-            >
-              Get started
-            </button>
+            {user ? (
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  navigate("/dashboard");
+                }}
+                className="w-full py-3 rounded-full bg-[#0B0E14] text-white text-[15px] font-semibold"
+              >
+                Go to dashboard
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navigate("/auth");
+                  }}
+                  className="w-full py-3 rounded-full border border-[#E3E6EB] text-[15px] font-semibold text-[#0B0E14]"
+                >
+                  Sign in
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navigate("/auth");
+                  }}
+                  className="w-full py-3 rounded-full bg-[#0B0E14] text-white text-[15px] font-semibold"
+                >
+                  Get started
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
