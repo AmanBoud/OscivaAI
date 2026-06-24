@@ -136,21 +136,6 @@ export default function HeroSection() {
                 onHoverChange={setPaused}
               />
             </div>
-            {/* floating proof chip */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.9, ease: EASE }}
-              className="absolute -bottom-5 -left-3 sm:-left-6 bg-white rounded-2xl shadow-float border border-[#EBEDF0] px-4 py-3 flex items-center gap-3"
-            >
-              <div className="w-9 h-9 rounded-xl bg-[#16A34A]/10 flex items-center justify-center">
-                <Check size={17} className="text-[#16A34A]" />
-              </div>
-              <div className="text-left">
-                <div className="text-[12px] font-bold text-[#0B0E14] leading-tight">Your AI is live</div>
-                <div className="text-[11px] text-[#8C94A1]">Answering customers 24/7</div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
 
