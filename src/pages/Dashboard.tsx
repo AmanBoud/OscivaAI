@@ -164,21 +164,24 @@ export default function Dashboard() {
               </div>
               <span className="text-[11px] text-foreground-secondary bg-secondary px-2.5 py-1 rounded-full font-medium">Last 7 days</span>
             </div>
-            <div className="flex items-end gap-2 sm:gap-3 h-44">
+            <div className="flex items-stretch gap-2 sm:gap-3 h-48">
               {weeklyData.map((d, i) => (
                 <div key={d.date} className="flex-1 flex flex-col items-center gap-2 group">
                   <span className={`text-[11px] font-bold tabular-nums ${i === todayIndex ? "text-primary" : "text-foreground-secondary"}`}>
                     {d.value.toLocaleString()}
                   </span>
-                  <motion.div
-                    key={`${d.date}-${d.value}`}
-                    initial={{ height: 0 }}
-                    animate={{ height: `${(d.value / maxVal) * 100}%` }}
-                    transition={{ delay: 0.3 + i * 0.05, duration: 0.55, ease: EASE }}
-                    className={`w-full rounded-md min-h-[4px] ${
-                      i === todayIndex ? "bg-primary" : "bg-primary/20 group-hover:bg-primary/35 transition-colors"
-                    }`}
-                  />
+                  {/* full-height track so the chart reads as columns even with low data */}
+                  <div className="relative w-full flex-1 rounded-md bg-secondary/60 overflow-hidden">
+                    <motion.div
+                      key={`${d.date}-${d.value}`}
+                      initial={{ height: 0 }}
+                      animate={{ height: `${(d.value / maxVal) * 100}%` }}
+                      transition={{ delay: 0.3 + i * 0.05, duration: 0.55, ease: EASE }}
+                      className={`absolute bottom-0 inset-x-0 rounded-md min-h-[3px] ${
+                        i === todayIndex ? "bg-primary" : "bg-primary/45 group-hover:bg-primary/65 transition-colors"
+                      }`}
+                    />
+                  </div>
                   <span className={`text-[10px] font-medium ${i === todayIndex ? "text-primary" : "text-foreground-muted"}`}>{d.day}</span>
                 </div>
               ))}

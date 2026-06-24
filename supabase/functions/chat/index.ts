@@ -488,8 +488,8 @@ Deno.serve(async (req) => {
           agent.user_id,
           agentId,
           "chat",
-          `New chat on ${agent.name ?? "your agent"}`,
-          userText || "A visitor started a conversation.",
+          `💬 New question for ${agent.name ?? "your agent"}`,
+          userText ? `A visitor asked: "${userText}"` : "A visitor started a conversation.",
         ).then(() => {}, () => {});
       }
       const countTurn = () => {

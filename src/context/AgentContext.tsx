@@ -210,7 +210,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     await writeAgentPassword(agentId, agent.password, agent.passwordEnabled);
 
     // Notify the owner (shows live in the dashboard bell). Best-effort.
-    void notify("agent", `Agent created: ${agent.name}`, `Your agent "${agent.name}" is live and ready to embed.`, agentId);
+    void notify("agent", `🎉 ${agent.name} is live!`, `Congrats — your new agent "${agent.name}" is ready. Embed it on your site to start helping customers.`, agentId);
 
     // Map old client source IDs -> new DB IDs
     const idMap: Record<string, string> = {};
