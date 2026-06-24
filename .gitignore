@@ -23,6 +23,11 @@ ROADMAP.md
 SCALING.md
 supabase/DEPLOY_ALL.sql
 
+# Local agent tooling / installed skills — keep local only
+.claude/
+.agents/
+skills-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

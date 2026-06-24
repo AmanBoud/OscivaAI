@@ -35,7 +35,7 @@ export default function FeaturesSection() {
           {/* Spotlight card */}
           <Reveal className="md:col-span-2 lg:row-span-2">
             <div className="relative h-full overflow-hidden rounded-3xl border border-[#EBEDF0] bg-[#0B0E14] p-8 text-white">
-              <div className="absolute inset-0 bg-grid-dark opacity-60" aria-hidden />
+              <div className="absolute inset-0 bg-aurora-dark" aria-hidden />
               <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#E8613C]/25 blur-[90px]" aria-hidden />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-[#E8613C] flex items-center justify-center mb-6 shadow-brand">

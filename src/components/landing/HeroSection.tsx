@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Play, Check } from "lucide-react";
 import { DashboardMockup } from "./UIMockups";
 
@@ -10,17 +11,37 @@ const up = (d: number) => ({
   transition: { duration: 0.7, delay: d, ease: EASE },
 });
 
+const ROTATING_WORDS = ["agents", "assistant", "chatbot"];
+
 const logos = ["E-Commerce", "Education", "Healthcare", "SaaS", "Real Estate", "Fintech", "Logistics", "Hospitality"];
 
 export default function HeroSection() {
   const navigate = useNavigate();
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setWordIndex((i) => (i + 1) % ROTATING_WORDS.length);
+    }, 3400);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-white pt-[120px] pb-16 md:pt-[150px] md:pb-24 px-5 sm:px-6">
       {/* Decorative background */}
-      <div className="absolute inset-0 bg-grid mask-fade-b opacity-[0.5]" aria-hidden />
-      <div className="absolute inset-0 bg-mesh" aria-hidden />
-      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-[#E8613C]/[0.06] blur-[120px]" aria-hidden />
+      <div className="absolute inset-0 bg-aurora" aria-hidden />
+      <motion.div
+        aria-hidden
+        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[820px] h-[480px] rounded-full bg-[#F7853B]/[0.10] blur-[130px]"
+        animate={{ opacity: [0.5, 0.85, 0.5], scale: [1, 1.08, 1] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="absolute top-24 -right-20 w-[420px] h-[420px] rounded-full bg-[#E8613C]/[0.08] blur-[120px]"
+        animate={{ opacity: [0.4, 0.7, 0.4], y: [0, -24, 0] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <div className="relative max-w-[1200px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-10 items-center">
@@ -30,13 +51,24 @@ export default function HeroSection() {
               {...up(0.08)}
               className="display text-[40px] sm:text-[52px] md:text-[60px] font-extrabold text-[#0B0E14]"
             >
-              AI agents that{" "}
-              <span className="relative whitespace-nowrap">
-                <span className="relative z-10 text-[#E8613C]">actually know</span>
+              AI{" "}
+              <span className="relative inline-flex align-bottom whitespace-nowrap">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={ROTATING_WORDS[wordIndex]}
+                    className="relative z-10 text-[#F7853B]"
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -18 }}
+                    transition={{ duration: 0.4, ease: EASE }}
+                  >
+                    {ROTATING_WORDS[wordIndex]}
+                  </motion.span>
+                </AnimatePresence>
                 <svg className="absolute -bottom-1 left-0 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none">
                   <motion.path
                     d="M2 7C40 3 160 3 198 6"
-                    stroke="#E8613C"
+                    stroke="#F7853B"
                     strokeWidth="3"
                     strokeLinecap="round"
                     initial={{ pathLength: 0 }}
@@ -45,7 +77,7 @@ export default function HeroSection() {
                   />
                 </svg>
               </span>{" "}
-              your business.
+              that actually know your business.
             </motion.h1>
 
             <motion.p
