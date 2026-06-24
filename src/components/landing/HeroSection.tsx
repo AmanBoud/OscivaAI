@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Play, Check } from "lucide-react";
-import { DashboardMockup } from "./UIMockups";
+import { HeroCarousel, HERO_SLIDE_COUNT } from "./UIMockups";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const up = (d: number) => ({
@@ -11,20 +11,26 @@ const up = (d: number) => ({
   transition: { duration: 0.7, delay: d, ease: EASE },
 });
 
-const ROTATING_WORDS = ["agents", "assistant", "chatbot"];
+// Paired 1:1 with the carousel slides (Dashboard → "agents", Live chat →
+// "chatbot", Embed → "assistant"). Keep length in sync with HERO_SLIDE_COUNT.
+const ROTATING_WORDS = ["agents", "chatbot", "assistant"];
 
 const logos = ["E-Commerce", "Education", "Healthcare", "SaaS", "Real Estate", "Fintech", "Logistics", "Hospitality"];
 
 export default function HeroSection() {
   const navigate = useNavigate();
-  const [wordIndex, setWordIndex] = useState(0);
+  // Single source of truth: the headline word and the hero carousel advance
+  // together off this index. Pauses while the visitor hovers the carousel.
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
+    if (paused) return;
     const id = setInterval(() => {
-      setWordIndex((i) => (i + 1) % ROTATING_WORDS.length);
-    }, 3400);
+      setIndex((i) => (i + 1) % HERO_SLIDE_COUNT);
+    }, 4200);
     return () => clearInterval(id);
-  }, []);
+  }, [paused]);
 
   return (
     <section className="relative overflow-hidden pt-[120px] pb-16 md:pt-[150px] md:pb-24 px-5 sm:px-6">
@@ -55,14 +61,14 @@ export default function HeroSection() {
               <span className="relative inline-flex align-bottom whitespace-nowrap">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.span
-                    key={ROTATING_WORDS[wordIndex]}
+                    key={ROTATING_WORDS[index]}
                     className="relative z-10 text-[#F7853B]"
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -18 }}
                     transition={{ duration: 0.4, ease: EASE }}
                   >
-                    {ROTATING_WORDS[wordIndex]}
+                    {ROTATING_WORDS[index]}
                   </motion.span>
                 </AnimatePresence>
                 <svg className="absolute -bottom-1 left-0 w-full" height="10" viewBox="0 0 200 10" fill="none" preserveAspectRatio="none">
@@ -124,7 +130,11 @@ export default function HeroSection() {
             className="relative [perspective:1200px]"
           >
             <div className="animate-float">
-              <DashboardMockup />
+              <HeroCarousel
+                active={index}
+                onSelect={setIndex}
+                onHoverChange={setPaused}
+              />
             </div>
             {/* floating proof chip */}
             <motion.div
