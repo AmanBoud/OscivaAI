@@ -261,6 +261,16 @@
       radial-gradient(40% 50% at 15% 10%, hsl(14 80% 57% / 0.10) 0%, transparent 60%),
       radial-gradient(35% 45% at 85% 0%, hsl(217 91% 60% / 0.08) 0%, transparent 55%);
   }
+  /* ---- Single-position ambient glows ----
+     Visible terracotta/amber radials placed at one spot each. Every section
+     uses the SAME intensity at a different position, so the glow is clearly
+     present everywhere yet no section differentiates from its neighbours. */
+  .bg-glow-tl { background: radial-gradient(46% 56% at 10% 4%,  hsl(14 90% 60% / 0.16) 0%, transparent 66%); }
+  .bg-glow-tr { background: radial-gradient(46% 56% at 90% 4%,  hsl(28 95% 62% / 0.15) 0%, transparent 66%); }
+  .bg-glow-bl { background: radial-gradient(48% 58% at 10% 96%, hsl(28 95% 62% / 0.15) 0%, transparent 66%); }
+  .bg-glow-br { background: radial-gradient(48% 58% at 90% 96%, hsl(14 90% 60% / 0.16) 0%, transparent 66%); }
+  .bg-glow-cl { background: radial-gradient(42% 54% at 0% 50%,  hsl(28 95% 62% / 0.14) 0%, transparent 68%); }
+  .bg-glow-cr { background: radial-gradient(42% 54% at 100% 50%, hsl(14 90% 60% / 0.15) 0%, transparent 68%); }
   .mask-fade-x {
     -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
     mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);

@@ -64,8 +64,8 @@ export default function PricingSection() {
   };
 
   return (
-    <section id="pricing" className="relative overflow-hidden bg-white py-20 md:py-28 px-5 sm:px-6">
-      <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+    <section id="pricing" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-glow-cr" aria-hidden />
       <div className="relative z-10 max-w-[1180px] mx-auto">
         <SectionHeading
           eyebrow="Pricing"

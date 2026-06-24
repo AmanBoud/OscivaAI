@@ -55,8 +55,8 @@ export default function FeaturesPage() {
       />
 
       {/* Deep-dive alternating rows */}
-      <section className="relative overflow-hidden bg-white py-12 md:py-16 px-5 sm:px-6">
-        <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+      <section className="relative overflow-hidden py-12 md:py-16 px-5 sm:px-6">
+        <div className="absolute inset-0 z-0 bg-glow-tl" aria-hidden />
         <div className="relative z-10 max-w-[1200px] mx-auto space-y-16 md:space-y-24">
           {deepDive.map((d, i) => {
             const flip = i % 2 === 1;
@@ -101,8 +101,8 @@ export default function FeaturesPage() {
       <FeaturesSection />
 
       {/* Security band */}
-      <section className="relative overflow-hidden bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
-        <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+      <section className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+        <div className="absolute inset-0 z-0 bg-glow-br" aria-hidden />
         <div className="relative z-10 max-w-[1200px] mx-auto">
           <SectionHeading
             eyebrow="Security & compliance"

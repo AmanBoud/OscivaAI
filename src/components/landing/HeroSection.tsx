@@ -27,7 +27,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-white pt-[120px] pb-16 md:pt-[150px] md:pb-24 px-5 sm:px-6">
+    <section className="relative overflow-hidden pt-[120px] pb-16 md:pt-[150px] md:pb-24 px-5 sm:px-6">
       {/* Decorative background */}
       <div className="absolute inset-0 bg-aurora" aria-hidden />
       <motion.div

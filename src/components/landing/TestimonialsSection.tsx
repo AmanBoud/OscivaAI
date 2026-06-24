@@ -22,13 +22,12 @@ const stats = [
 
 export default function TestimonialsSection() {
   return (
-    <section id="testimonials" className="bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
-      <div className="max-w-[1200px] mx-auto">
+    <section id="testimonials" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
+      <div className="relative z-10 max-w-[1200px] mx-auto">
         {/* Stats band */}
         <Reveal>
           <div className="relative overflow-hidden rounded-3xl bg-[#0B0E14] p-8 md:p-12 mb-20">
-            <div className="absolute inset-0 bg-aurora-dark" aria-hidden />
-            <div className="absolute -top-20 left-1/4 w-72 h-72 rounded-full bg-[#E8613C]/20 blur-[100px]" aria-hidden />
             <div className="relative grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((s, i) => (
                 <motion.div

@@ -27,8 +27,8 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
-      <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+    <section id="how-it-works" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-glow-tl" aria-hidden />
       <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
           eyebrow="How it works"

@@ -34,20 +34,8 @@ export default function PageHero({
   const navigate = useNavigate();
 
   return (
-    <section className="relative overflow-hidden bg-white pt-[130px] pb-16 md:pt-[160px] md:pb-20 px-5 sm:px-6">
-      <div className="absolute inset-0 bg-aurora" aria-hidden />
-      <motion.div
-        aria-hidden
-        className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[460px] rounded-full bg-[#F7853B]/[0.10] blur-[130px]"
-        animate={{ opacity: [0.5, 0.85, 0.5], scale: [1, 1.08, 1] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="absolute top-16 -right-16 w-[400px] h-[400px] rounded-full bg-[#E8613C]/[0.08] blur-[120px]"
-        animate={{ opacity: [0.4, 0.7, 0.4], y: [0, -24, 0] }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-      />
+    <section className="relative overflow-hidden pt-[130px] pb-16 md:pt-[160px] md:pb-20 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
 
       <div className="relative max-w-[820px] mx-auto text-center">
         <motion.nav {...up(0)} className="flex items-center justify-center gap-1.5 text-[12.5px] text-[#8C94A1] mb-6">

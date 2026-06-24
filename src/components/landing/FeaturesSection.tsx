@@ -23,8 +23,9 @@ const integrations = ["WhatsApp", "Slack", "Zendesk", "Freshdesk", "Salesforce",
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="bg-white py-20 md:py-28 px-5 sm:px-6">
-      <div className="max-w-[1200px] mx-auto">
+    <section id="features" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-glow-br" aria-hidden />
+      <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
           eyebrow="Platform"
           title="Everything you need. None of the complexity."
@@ -35,8 +36,6 @@ export default function FeaturesSection() {
           {/* Spotlight card */}
           <Reveal className="md:col-span-2 lg:row-span-2">
             <div className="relative h-full overflow-hidden rounded-3xl border border-[#EBEDF0] bg-[#0B0E14] p-8 text-white">
-              <div className="absolute inset-0 bg-aurora-dark" aria-hidden />
-              <div className="absolute -top-24 -right-16 w-72 h-72 rounded-full bg-[#E8613C]/25 blur-[90px]" aria-hidden />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-[#E8613C] flex items-center justify-center mb-6 shadow-brand">
                   <spotlight.icon size={22} className="text-white" />
