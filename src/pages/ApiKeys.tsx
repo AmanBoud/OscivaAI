@@ -59,24 +59,24 @@ export default function ApiKeys() {
   return (
     <>
       <Topbar title="API Keys" subtitle="Manage your AI provider keys" />
-      <div className="p-4 sm:p-6 space-y-5 max-w-3xl">
-        <div className="rounded-2xl border border-border bg-card p-5 flex items-start gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Shield size={19} className="text-primary" />
+      <div className="p-4 sm:p-6 space-y-4 max-w-4xl">
+        <div className="rounded-2xl border border-border bg-card p-4 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Shield size={17} className="text-primary" />
           </div>
           <div>
-            <p className="text-[13.5px] font-bold text-foreground">Saved securely to your account</p>
+            <p className="text-[13px] font-bold text-foreground">Saved securely to your account</p>
             <p className="text-[12px] text-foreground-muted mt-0.5 leading-relaxed">Keys are stored server-side in your Osciva account and used only when your widget answers. Visitors never see them.</p>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {providers.map((p) => {
             const stored = keys[p.name];
             const hasKey = !!stored;
             return (
-              <div key={p.name} className="rounded-2xl border border-border bg-card p-5 hover:shadow-premium transition-shadow">
-                <div className="flex items-center justify-between mb-4">
+              <div key={p.name} className="rounded-2xl border border-border bg-card p-4 hover:shadow-premium transition-shadow">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-semibold text-foreground">{p.name}</h3>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
