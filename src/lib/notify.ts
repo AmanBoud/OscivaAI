@@ -13,13 +13,18 @@ export async function notify(type: string, title: string, body?: string, agentId
     const { data } = await supabase.auth.getSession();
     const uid = data.session?.user?.id;
     if (!uid) return;
-    await supabase.from("notifications").insert({
+    const { error } = await supabase.from("notifications").insert({
       user_id: uid,
       type,
       title,
       body: body ?? null,
       agent_id: agentId ?? null,
     });
+    // Nudge the bell to refetch right away (don't rely solely on Realtime,
+    // which can be disabled or lag). Harmless no-op outside the browser.
+    if (!error && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("osciva-notify"));
+    }
   } catch {
     // notifications must never break the triggering action
   }

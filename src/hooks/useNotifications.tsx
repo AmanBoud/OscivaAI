@@ -43,6 +43,15 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     load();
   }, [load]);
 
+  // Refetch immediately when something creates a notification client-side
+  // (agent created/deleted, API key saved) — independent of Realtime.
+  useEffect(() => {
+    if (!user) return;
+    const onNotify = () => load();
+    window.addEventListener("osciva-notify", onNotify);
+    return () => window.removeEventListener("osciva-notify", onNotify);
+  }, [user, load]);
+
   // Live updates — new notifications stream in without a refresh.
   useEffect(() => {
     if (!user) return;
