@@ -29,7 +29,19 @@ export default function HeroSection() {
   return (
     <section className="relative overflow-hidden pt-[120px] pb-16 md:pt-[150px] md:pb-24 px-5 sm:px-6">
       {/* Decorative background */}
-      <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
+      <div className="absolute inset-0 bg-aurora" aria-hidden />
+      <motion.div
+        aria-hidden
+        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[820px] h-[480px] rounded-full bg-[#F7853B]/[0.10] blur-[130px]"
+        animate={{ opacity: [0.5, 0.85, 0.5], scale: [1, 1.08, 1] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden
+        className="absolute top-24 -right-20 w-[420px] h-[420px] rounded-full bg-[#E8613C]/[0.08] blur-[120px]"
+        animate={{ opacity: [0.4, 0.7, 0.4], y: [0, -24, 0] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <div className="relative max-w-[1200px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-10 items-center">
