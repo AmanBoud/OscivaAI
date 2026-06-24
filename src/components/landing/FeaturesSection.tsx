@@ -24,7 +24,7 @@ const integrations = ["WhatsApp", "Slack", "Zendesk", "Freshdesk", "Salesforce",
 export default function FeaturesSection() {
   return (
     <section id="features" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
-      <div className="absolute inset-0 z-0 bg-glow-br" aria-hidden />
+      <div className="absolute inset-0 z-0 bg-glow-bl" aria-hidden />
       <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
           eyebrow="Platform"

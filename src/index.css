@@ -272,7 +272,10 @@
   .bg-glow-br { background: radial-gradient(50% 54% at 86% 60%, hsl(14 90% 60% / 0.18) 0%, transparent 72%); }
   .bg-glow-cl { background: radial-gradient(46% 52% at 2% 50%,  hsl(28 95% 62% / 0.16) 0%, transparent 74%); }
   .bg-glow-cr { background: radial-gradient(46% 52% at 98% 50%, hsl(14 90% 60% / 0.17) 0%, transparent 74%); }
-  .bg-glow-tl, .bg-glow-tr, .bg-glow-bl, .bg-glow-br, .bg-glow-cl, .bg-glow-cr {
+  /* Centred glow — for sections reused across pages, so they never stack on
+     the same side as a neighbouring hero/section. */
+  .bg-glow-tc { background: radial-gradient(52% 52% at 50% 42%, hsl(20 92% 61% / 0.16) 0%, transparent 72%); }
+  .bg-glow-tl, .bg-glow-tr, .bg-glow-bl, .bg-glow-br, .bg-glow-cl, .bg-glow-cr, .bg-glow-tc {
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
   }

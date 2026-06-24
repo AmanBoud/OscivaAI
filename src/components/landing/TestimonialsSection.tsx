@@ -23,7 +23,7 @@ const stats = [
 export default function TestimonialsSection() {
   return (
     <section id="testimonials" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
-      <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
+      <div className="absolute inset-0 z-0 bg-glow-tl" aria-hidden />
       <div className="relative z-10 max-w-[1200px] mx-auto">
         {/* Stats band */}
         <Reveal>

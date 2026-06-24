@@ -49,7 +49,7 @@ export default function ContactPage() {
       />
 
       <section className="relative overflow-hidden pb-12 px-5 sm:px-6">
-        <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
+        <div className="absolute inset-0 z-0 bg-glow-tl" aria-hidden />
         <div className="relative z-10 max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-14 items-start">
           {/* Left: methods + reasons */}
           <div>
@@ -150,7 +150,7 @@ export default function ContactPage() {
 
       {/* Reassurance band */}
       <section className="relative overflow-hidden pt-8 pb-24 px-5 sm:px-6">
-        <div className="absolute inset-0 z-0 bg-glow-bl" aria-hidden />
+        <div className="absolute inset-0 z-0 bg-glow-br" aria-hidden />
         <div className="relative z-10 max-w-[1100px] mx-auto">
           <SectionHeading
             eyebrow="Prefer self-serve?"

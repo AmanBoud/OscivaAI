@@ -41,7 +41,7 @@ export default function HowItWorksPage() {
 
       {/* Use cases */}
       <section className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
-        <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
+        <div className="absolute inset-0 z-0 bg-glow-tl" aria-hidden />
         <div className="relative z-10 max-w-[1200px] mx-auto">
           <SectionHeading
             eyebrow="Use cases"
@@ -67,7 +67,7 @@ export default function HowItWorksPage() {
 
       {/* Before / after comparison */}
       <section className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
-        <div className="absolute inset-0 z-0 bg-glow-cl" aria-hidden />
+        <div className="absolute inset-0 z-0 bg-glow-cr" aria-hidden />
         <div className="relative z-10 max-w-[1000px] mx-auto">
           <SectionHeading eyebrow="Why teams switch" title="The old way vs. the Osciva way" />
           <Reveal>
