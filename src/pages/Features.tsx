@@ -64,11 +64,7 @@ export default function FeaturesPage() {
               <div key={d.title} className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <Reveal className={flip ? "lg:order-2" : ""}>
                   <div>
-                    <span className="eyebrow text-[#E8613C]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#E8613C]" />
-                      {d.tag}
-                    </span>
-                    <h3 className="display mt-4 text-[26px] md:text-[34px] font-extrabold text-[#0B0E14]">{d.title}</h3>
+                    <h3 className="display text-[26px] md:text-[34px] font-extrabold text-[#0B0E14]">{d.title}</h3>
                     <p className="mt-4 text-[15px] text-[#586072] leading-relaxed max-w-md">{d.desc}</p>
                     <ul className="mt-6 space-y-3">
                       {d.points.map((p) => (

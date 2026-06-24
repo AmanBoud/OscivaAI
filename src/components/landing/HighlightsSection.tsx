@@ -1,5 +1,6 @@
+import { motion, type Variants } from "framer-motion";
 import { Clock, Boxes, MousePointerClick, ShieldCheck } from "lucide-react";
-import { Reveal, SectionHeading } from "./_primitives";
+import { SectionHeading } from "./_primitives";
 
 const reasons = [
   { icon: Clock, title: "Live in ~30 minutes", desc: "Upload your data, configure the assistant, embed one snippet. No setup hell, no engineering sprint." },
@@ -8,9 +9,21 @@ const reasons = [
   { icon: ShieldCheck, title: "Secure by default", desc: "Encryption in transit and at rest, India-hosted data, and DPDP-ready controls out of the box." },
 ];
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+// Cards reveal one-by-one as the section scrolls in.
+const grid: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.14, delayChildren: 0.05 } },
+};
+const card: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
+
 export default function HighlightsSection() {
   return (
-    <section className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+    <section className="relative overflow-hidden py-16 md:py-20 px-5 sm:px-6">
       <div className="absolute inset-0 z-0 bg-glow-bl" aria-hidden />
       <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
@@ -19,9 +32,15 @@ export default function HighlightsSection() {
           subtitle="Built for non-technical teams who want production-grade results without the production-grade complexity."
         />
 
-        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {reasons.map((r, i) => (
-            <Reveal key={r.title} i={i}>
+        <motion.div
+          className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          variants={grid}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
+          {reasons.map((r) => (
+            <motion.div key={r.title} variants={card} className="h-full">
               <div className="group h-full rounded-2xl border border-[#EBEDF0] bg-white p-6 transition-all duration-300 hover:border-[#E8613C]/30 hover:shadow-premium hover:-translate-y-1">
                 <div className="w-12 h-12 rounded-xl bg-[#F7F8FA] border border-[#EBEDF0] flex items-center justify-center mb-5 transition-colors group-hover:bg-[#FFF1EC] group-hover:border-[#E8613C]/20">
                   <r.icon size={21} className="text-[#0B0E14] transition-colors group-hover:text-[#E8613C]" />
@@ -29,9 +48,9 @@ export default function HighlightsSection() {
                 <h3 className="text-[16px] font-bold text-[#0B0E14] mb-2">{r.title}</h3>
                 <p className="text-[13.5px] text-[#586072] leading-relaxed">{r.desc}</p>
               </div>
-            </Reveal>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

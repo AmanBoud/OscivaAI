@@ -52,23 +52,13 @@ export function Reveal({
   );
 }
 
-/** Small uppercase label above section titles. */
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <span className="eyebrow text-[#E8613C]">
-      <span className="h-1.5 w-1.5 rounded-full bg-[#E8613C]" />
-      {children}
-    </span>
-  );
-}
-
 /** Centered section heading block. */
 export function SectionHeading({
-  eyebrow,
   title,
   subtitle,
   align = "center",
 }: {
+  /** @deprecated No longer rendered — the orange dot-eyebrow was removed site-wide. */
   eyebrow?: string;
   title: ReactNode;
   subtitle?: ReactNode;
@@ -77,18 +67,13 @@ export function SectionHeading({
   const wrap = align === "center" ? "text-center mx-auto items-center" : "text-left items-start";
   return (
     <div className={`flex flex-col ${wrap} max-w-2xl ${align === "center" ? "mx-auto" : ""}`}>
-      {eyebrow && (
-        <Reveal>
-          <Eyebrow>{eyebrow}</Eyebrow>
-        </Reveal>
-      )}
-      <Reveal i={1}>
-        <h2 className="display mt-4 text-[30px] sm:text-[36px] md:text-[44px] font-extrabold text-[#0B0E14]">
+      <Reveal>
+        <h2 className="display text-[30px] sm:text-[36px] md:text-[44px] font-extrabold text-[#0B0E14]">
           {title}
         </h2>
       </Reveal>
       {subtitle && (
-        <Reveal i={2}>
+        <Reveal i={1}>
           <p className="mt-4 text-[15px] md:text-[16px] leading-relaxed text-[#586072]">{subtitle}</p>
         </Reveal>
       )}

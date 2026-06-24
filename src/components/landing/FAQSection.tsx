@@ -16,7 +16,7 @@ export default function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+    <section id="faq" className="relative overflow-hidden py-16 md:py-20 px-5 sm:px-6">
       <div className="absolute inset-0 z-0 bg-glow-cl" aria-hidden />
       <div className="relative z-10 max-w-[760px] mx-auto">
         <SectionHeading eyebrow="FAQ" title="Frequently asked questions" />

@@ -12,7 +12,7 @@ const benefits = [
 
 export default function BenefitsSection() {
   return (
-    <section className="relative overflow-hidden py-20 md:py-28 px-5 sm:px-6">
+    <section className="relative overflow-hidden py-16 md:py-20 px-5 sm:px-6">
       <div className="absolute inset-0 z-0 bg-glow-tr" aria-hidden />
       <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
