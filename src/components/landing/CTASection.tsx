@@ -11,7 +11,7 @@ export default function CTASection() {
     <section id="contact" className="bg-white px-5 sm:px-6 pb-20 md:pb-28">
       <div className="max-w-[1100px] mx-auto">
         <div className="relative overflow-hidden rounded-[32px] bg-[#0B0E14] px-6 py-16 md:px-16 md:py-20 text-center">
-          <div className="absolute inset-0 bg-grid-dark opacity-50" aria-hidden />
+          <div className="absolute inset-0 bg-aurora-dark" aria-hidden />
           <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#E8613C]/25 blur-[110px]" aria-hidden />
 
           <motion.div

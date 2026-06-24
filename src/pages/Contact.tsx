@@ -48,8 +48,9 @@ export default function ContactPage() {
         primaryCta={null}
       />
 
-      <section className="bg-white pb-12 px-5 sm:px-6">
-        <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-14 items-start">
+      <section className="relative overflow-hidden bg-white pb-12 px-5 sm:px-6">
+        <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+        <div className="relative z-10 max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 lg:gap-14 items-start">
           {/* Left: methods + reasons */}
           <div>
             <Reveal>

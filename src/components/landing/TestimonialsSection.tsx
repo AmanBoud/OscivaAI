@@ -27,7 +27,7 @@ export default function TestimonialsSection() {
         {/* Stats band */}
         <Reveal>
           <div className="relative overflow-hidden rounded-3xl bg-[#0B0E14] p-8 md:p-12 mb-20">
-            <div className="absolute inset-0 bg-grid-dark opacity-50" aria-hidden />
+            <div className="absolute inset-0 bg-aurora-dark" aria-hidden />
             <div className="absolute -top-20 left-1/4 w-72 h-72 rounded-full bg-[#E8613C]/20 blur-[100px]" aria-hidden />
             <div className="relative grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((s, i) => (

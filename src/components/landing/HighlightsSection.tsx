@@ -10,8 +10,9 @@ const reasons = [
 
 export default function HighlightsSection() {
   return (
-    <section className="bg-white py-20 md:py-28 px-5 sm:px-6">
-      <div className="max-w-[1200px] mx-auto">
+    <section className="relative overflow-hidden bg-white py-20 md:py-28 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+      <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
           eyebrow="Why Osciva"
           title="The fastest path from data to a working AI agent"

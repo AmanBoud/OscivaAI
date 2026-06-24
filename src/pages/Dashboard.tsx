@@ -69,7 +69,7 @@ export default function Dashboard() {
           transition={{ duration: 0.5, ease: EASE }}
           className="relative overflow-hidden rounded-2xl border border-border bg-[#0B0E14] p-6"
         >
-          <div className="absolute inset-0 bg-grid-dark opacity-50" aria-hidden />
+          <div className="absolute inset-0 bg-aurora-dark" aria-hidden />
           <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-primary/25 blur-[90px]" aria-hidden />
           <div className="relative flex items-center justify-between gap-4">
             <div>

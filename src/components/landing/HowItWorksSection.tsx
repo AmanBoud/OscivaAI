@@ -27,8 +27,9 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="relative bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
-      <div className="max-w-[1200px] mx-auto">
+    <section id="how-it-works" className="relative overflow-hidden bg-[#F7F8FA] py-20 md:py-28 px-5 sm:px-6">
+      <div className="absolute inset-0 z-0 bg-aurora-soft" aria-hidden />
+      <div className="relative z-10 max-w-[1200px] mx-auto">
         <SectionHeading
           eyebrow="How it works"
           title="From idea to live AI in three steps"
