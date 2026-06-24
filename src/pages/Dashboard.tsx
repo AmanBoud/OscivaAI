@@ -74,7 +74,13 @@ export default function Dashboard() {
   );
   const [phraseIdx, setPhraseIdx] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setPhraseIdx((i) => (i + 1) % phrases.length), 3500);
+    let step = 0;
+    const id = setInterval(() => {
+      step += 1;
+      setPhraseIdx(step % phrases.length);
+      // Run one full loop, then settle back on the greeting and stop.
+      if (step >= phrases.length) clearInterval(id);
+    }, 4500);
     return () => clearInterval(id);
   }, [phrases.length]);
 
