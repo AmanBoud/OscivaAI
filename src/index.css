@@ -242,7 +242,7 @@
   .bg-aurora {
     background:
       radial-gradient(45% 55% at 12% 8%, hsl(14 90% 60% / 0.16) 0%, transparent 60%),
-      radial-gradient(40% 50% at 88% 4%, hsl(28 95% 62% / 0.14) 0%, transparent 58%);
+      radial-gradient(40% 50% at 88% 42%, hsl(28 95% 62% / 0.14) 0%, transparent 58%);
   }
   .bg-aurora-soft {
     background:

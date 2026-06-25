@@ -1,12 +1,10 @@
 import LandingNavbar from "@/components/landing/LandingNavbar";
 import HeroSection from "@/components/landing/HeroSection";
 import HighlightsSection from "@/components/landing/HighlightsSection";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
-import BenefitsSection from "@/components/landing/BenefitsSection";
+import HomeHowItWorks from "@/components/landing/HomeHowItWorks";
+import HomeFeatures from "@/components/landing/HomeFeatures";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import PricingSection from "@/components/landing/PricingSection";
-import FAQSection from "@/components/landing/FAQSection";
+import HomePricing from "@/components/landing/HomePricing";
 import CTASection from "@/components/landing/CTASection";
 import FooterSection from "@/components/landing/FooterSection";
 
@@ -16,12 +14,10 @@ export default function Landing() {
       <LandingNavbar />
       <HeroSection />
       <HighlightsSection />
-      <HowItWorksSection />
-      <FeaturesSection />
-      <BenefitsSection />
+      <HomeHowItWorks />
+      <HomeFeatures />
       <TestimonialsSection />
-      <PricingSection />
-      <FAQSection />
+      <HomePricing />
       <CTASection />
       <FooterSection />
     </div>

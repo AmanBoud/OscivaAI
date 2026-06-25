@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Reveal, SectionHeading } from "./_primitives";
+import CountUp from "./CountUp";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -8,16 +9,13 @@ const testimonials = [
   { name: "Priya Sharma", role: "CTO, FinEdge Solutions", text: "Osciva transformed our support. Response time dropped 80% and CSAT went through the roof.", avatar: "PS" },
   { name: "Rahul Menon", role: "Founder, ShopKart", text: "Setting up our agent took under 30 minutes. It now handles 70% of customer queries with no human in the loop.", avatar: "RM" },
   { name: "Ananya Gupta", role: "VP Product, HealthBridge", text: "The knowledge-base retrieval is a game-changer. It answers complex queries accurately from our own docs.", avatar: "AG" },
-  { name: "Vikram Patel", role: "Head of CX, UrbanClap", text: "The only platform that understood Indian languages natively and handled our booking workflows.", avatar: "VP" },
-  { name: "Meera Iyer", role: "COO, EduFirst", text: "Within a week we cut ticket volume 60% while improving satisfaction. Our team focuses on what matters.", avatar: "MI" },
-  { name: "Arjun Nair", role: "CTO, PaySecure", text: "DPDP compliance and India hosting made Osciva the clear choice for our financial platform.", avatar: "AN" },
 ];
 
 const stats = [
-  { value: "500+", label: "Businesses trust us" },
-  { value: "10M+", label: "Messages handled" },
-  { value: "99.9%", label: "Platform uptime" },
-  { value: "<1.2s", label: "Avg. response time" },
+  { value: 500, suffix: "+", label: "Businesses trust us" },
+  { value: 10, suffix: "M+", label: "Messages handled" },
+  { value: 99.9, decimals: 1, suffix: "%", label: "Platform uptime" },
+  { value: 1.2, decimals: 1, prefix: "<", suffix: "s", label: "Avg. response time" },
 ];
 
 export default function TestimonialsSection() {
@@ -38,7 +36,9 @@ export default function TestimonialsSection() {
                   transition={{ delay: i * 0.08, duration: 0.6, ease: EASE }}
                   className="text-center"
                 >
-                  <div className="text-[30px] md:text-[40px] font-extrabold text-white display">{s.value}</div>
+                  <div className="text-[30px] md:text-[40px] font-extrabold text-white display">
+                    <CountUp value={s.value} decimals={s.decimals} prefix={s.prefix} suffix={s.suffix} />
+                  </div>
                   <div className="text-[12.5px] text-white/55 font-medium mt-1">{s.label}</div>
                 </motion.div>
               ))}

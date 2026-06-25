@@ -13,19 +13,19 @@ const columns = [
   {
     title: "Company",
     links: [
-      { label: "About", path: "/" },
-      { label: "Careers", path: "/" },
-      { label: "Blog", path: "/" },
+      { label: "About", path: "/about" },
+      { label: "Careers", path: "/careers" },
+      { label: "Blog", path: "/blog" },
       { label: "Contact", path: "/contact" },
     ],
   },
   {
     title: "Legal",
     links: [
-      { label: "Privacy", path: "/" },
-      { label: "Terms", path: "/" },
-      { label: "DPDP", path: "/" },
-      { label: "Security", path: "/" },
+      { label: "Privacy", path: "/privacy" },
+      { label: "Terms", path: "/terms" },
+      { label: "DPDP", path: "/dpdp" },
+      { label: "Security", path: "/security" },
     ],
   },
 ];
@@ -74,9 +74,8 @@ export default function FooterSection() {
           ))}
         </div>
 
-        <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="border-t border-white/10 mt-12 pt-6">
           <p className="text-[12.5px] text-white/45">© {year} Osciva AI. All rights reserved.</p>
-          <p className="text-[12.5px] text-white/45">Made in India 🇮🇳</p>
         </div>
       </div>
     </footer>

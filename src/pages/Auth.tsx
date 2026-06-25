@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Eye, EyeOff, Check, Bot, Zap, Shield, Sparkles, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import authAgentAvatar from "@/assets/auth-agent-avatar.png";
+import CountUp from "@/components/landing/CountUp";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -23,6 +23,8 @@ const floatingIcons = [
   { icon: Bot, x: "50%", y: "85%", delay: 0.8, size: 20 },
 ];
 
+const rotatingWords = ["agents", "chatbots", "assistants"];
+
 export default function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,12 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setWordIndex((i) => (i + 1) % rotatingWords.length), 2600);
+    return () => clearInterval(id);
+  }, []);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -149,87 +157,102 @@ export default function AuthPage() {
         </motion.div>
       ))}
 
-      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10">
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/5"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 6, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/8"
-            animate={{ scale: [1.2, 1, 1.2], opacity: [0.4, 0.2, 0.4] }}
-            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-          />
-        </div>
-
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/10">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 max-w-md text-center px-8"
-        >
-          <motion.div
-            className="mx-auto mb-10 relative w-48 h-48"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+          className="absolute -top-24 -right-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl"
+          animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.1, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-20 -left-16 w-72 h-72 rounded-full bg-primary/10 blur-3xl"
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+
+        <div className="relative z-10 w-full flex flex-col justify-center p-12 xl:p-16">
+          <motion.button
+            onClick={() => navigate("/")}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute top-12 left-12 xl:top-16 xl:left-16 flex items-center gap-2.5 w-fit"
           >
-            <motion.div
-              className="absolute inset-0 rounded-full bg-primary/20 blur-2xl"
-              animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-dashed border-primary/30"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div
-              className="absolute inset-3 rounded-full bg-gradient-to-br from-card to-background border border-border shadow-2xl overflow-hidden"
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <img
-                src={authAgentAvatar}
-                alt="Osciva AI assistant avatar"
-                width={384}
-                height={384}
-                loading="lazy"
-                className="w-full h-full object-cover scale-110"
-              />
-            </motion.div>
-            <motion.div
-              className="absolute bottom-3 right-4 flex items-center gap-1.5 px-2 py-1 rounded-full bg-card border border-border shadow-md z-10"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
-              </span>
-              <span className="text-[10px] font-semibold text-foreground">Online</span>
-            </motion.div>
+            <img src="https://osciva.io/images/osciva-web.png" alt="Osciva" className="h-9 w-9" />
+            <span className="text-lg font-bold text-foreground tracking-tight">
+              Osciva <span className="text-primary">AI</span>
+            </span>
+          </motion.button>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="max-w-md"
+          >
+            <h2 className="text-3xl xl:text-[40px] font-bold text-foreground leading-[1.1]">
+              Build AI{" "}
+              <span className="relative inline-flex whitespace-nowrap align-bottom">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={rotatingWords[wordIndex]}
+                    className="text-primary"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    {rotatingWords[wordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>{" "}
+              that actually know your business.
+            </h2>
+            <p className="mt-4 text-[15px] text-foreground-secondary leading-relaxed">
+              Train an assistant on your own data and deploy it anywhere, in minutes. No developers, no glue code.
+            </p>
+
+            <ul className="mt-8 space-y-4">
+              {[
+                "Trained on your documents, website and FAQs",
+                "Live on any site in about 30 minutes",
+                "20+ Indian languages, GST invoices, India-hosted",
+              ].map((v, i) => (
+                <motion.li
+                  key={v}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.28 + i * 0.1 }}
+                  className="flex items-center gap-3 text-[14.5px] text-foreground/80"
+                >
+                  <span className="grid place-items-center w-5 h-5 rounded-full bg-primary/15 shrink-0">
+                    <Check size={12} className="text-primary" />
+                  </span>
+                  {v}
+                </motion.li>
+              ))}
+            </ul>
           </motion.div>
 
-          <h2 className="text-2xl font-bold text-foreground mb-3">Your AI Agents Await</h2>
-          <p className="text-foreground-secondary text-sm leading-relaxed">
-            Build, train, and deploy intelligent AI agents for your business — all from one platform.
-          </p>
-
-          <div className="flex justify-center gap-6 mt-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.55 }}
+            className="flex gap-9 mt-12"
+          >
             {[
-              { num: "500+", label: "Businesses" },
-              { num: "10M+", label: "Messages" },
-              { num: "99.9%", label: "Uptime" },
+              { value: 500, suffix: "+", label: "Businesses" },
+              { value: 10, suffix: "M+", label: "Messages" },
+              { value: 99.9, decimals: 1, suffix: "%", label: "Uptime" },
             ].map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-lg font-bold text-primary">{s.num}</div>
+              <div key={s.label}>
+                <div className="text-2xl font-bold text-primary">
+                  <CountUp value={s.value} decimals={s.decimals} suffix={s.suffix} />
+                </div>
                 <div className="text-xs text-foreground-muted">{s.label}</div>
               </div>
             ))}
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
@@ -425,8 +448,8 @@ export default function AuthPage() {
             </button>
           </form>
 
-          <div className="flex flex-wrap gap-2 mt-6 justify-center">
-            {["🇮🇳 India Hosted", "DPDP Compliant", "SOC 2 Ready"].map((b) => (
+          <div className="flex flex-wrap gap-2 mt-4 justify-center">
+            {["DPDP Compliant", "SOC 2 Ready"].map((b) => (
               <span key={b} className="text-[10px] px-2.5 py-1 rounded-full bg-secondary text-foreground-muted border border-border font-medium">
                 {b}
               </span>

@@ -9,12 +9,17 @@ import { NotificationProvider } from "@/hooks/useNotifications";
 import { ThemeProvider } from "@/hooks/useTheme";
 import AppLayout from "@/components/layout/AppLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ScrollToTop from "@/components/ScrollToTop";
 import { ensureDataVersion } from "@/lib/userStore";
 import Landing from "@/pages/Landing";
 import FeaturesPage from "@/pages/Features";
 import HowItWorksPage from "@/pages/HowItWorks";
 import PricingPage from "@/pages/Pricing";
 import ContactPage from "@/pages/Contact";
+import About from "@/pages/About";
+import Careers from "@/pages/Careers";
+import Blog from "@/pages/Blog";
+import Legal from "@/pages/Legal";
 import Auth from "@/pages/Auth";
 import ResetPassword from "@/pages/ResetPassword";
 import Dashboard from "@/pages/Dashboard";
@@ -50,12 +55,20 @@ const App = () => {
           <AgentProvider>
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/features" element={<FeaturesPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/privacy" element={<Legal slug="privacy" />} />
+                <Route path="/terms" element={<Legal slug="terms" />} />
+                <Route path="/dpdp" element={<Legal slug="dpdp" />} />
+                <Route path="/security" element={<Legal slug="security" />} />
                 <Route path="/docs" element={<Docs />} />
                 <Route path="/auth" element={<AuthRoute />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

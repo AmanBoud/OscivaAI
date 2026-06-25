@@ -44,7 +44,7 @@ export default function HeroSection() {
       />
       <motion.div
         aria-hidden
-        className="absolute top-24 -right-20 w-[420px] h-[420px] rounded-full bg-[#E8613C]/[0.08] blur-[120px]"
+        className="absolute top-[320px] -right-20 w-[420px] h-[420px] rounded-full bg-[#E8613C]/[0.08] blur-[120px]"
         animate={{ opacity: [0.4, 0.7, 0.4], y: [0, -24, 0] }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
       />
