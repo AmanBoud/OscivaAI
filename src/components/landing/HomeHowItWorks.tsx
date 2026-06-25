@@ -12,16 +12,15 @@ const steps = [
 
 export default function HomeHowItWorks() {
   const reduce = useReducedMotion();
-  // `active` is the card shown in the centre (and highlighted). It cycles, and
-  // the other two slide out to the sides, dimmed.
+  // `active` is the card shown in the centre (and highlighted). It cycles on a
+  // steady timer; hovering does not change it.
   const [active, setActive] = useState(1);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (reduce || paused) return;
+    if (reduce) return;
     const id = setInterval(() => setActive((i) => (i + 1) % steps.length), 3600);
     return () => clearInterval(id);
-  }, [reduce, paused]);
+  }, [reduce]);
 
   // Render order: previous on the left, active in the middle, next on the right.
   const order = [
@@ -40,23 +39,16 @@ export default function HomeHowItWorks() {
         />
 
         <Reveal>
-          <div
-            className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
+          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5">
             {order.map((idx, pos) => {
               const s = steps[idx];
               const on = reduce || pos === 1; // the centre card is highlighted
               return (
-                <motion.button
+                <motion.div
                   key={s.num}
                   layout
                   transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                  type="button"
-                  onMouseEnter={() => setActive(idx)}
-                  onFocus={() => setActive(idx)}
-                  className={`block w-full text-left h-full rounded-2xl border p-7 bg-white transition-[opacity,box-shadow,border-color] duration-500 ${
+                  className={`h-full rounded-2xl border p-7 bg-white transition-[opacity,box-shadow,border-color] duration-500 ${
                     on
                       ? "border-[#E8613C]/40 shadow-premium opacity-100"
                       : "border-[#EBEDF0] opacity-40"
@@ -71,7 +63,7 @@ export default function HomeHowItWorks() {
                   </span>
                   <h3 className="mt-3 text-[17px] font-bold text-[#0B0E14]">{s.title}</h3>
                   <p className="mt-2 text-[13.5px] text-[#586072] leading-relaxed">{s.desc}</p>
-                </motion.button>
+                </motion.div>
               );
             })}
           </div>
